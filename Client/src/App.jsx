@@ -3,17 +3,22 @@ import styled from "styled-components";
 
 import SideNav from "./components/SideNav";
 import NavHeader from "./components/NavHeader";
+import { useState } from "react";
 
 const Container = styled.div`
+  display: flex;
+  position: relative; //mobile
   height: 100vh;
   width: 100vw;
-  display: flex;
 `;
 
 const ContentContainer = styled.div`
-  width: 85%;
+  width: 100%; // mobile
   height: 100vh;
-  /* background-color: lightpink; */
+
+  @media (min-width: 1024px) {
+    width: 85%; // for laptop, bg screens
+  }
 `;
 
 const Content = styled.div`
@@ -23,12 +28,23 @@ const Content = styled.div`
 `;
 
 const App = () => {
+  const [headerText, setHeaderText] = useState("DashBoard");
+  const [toggleSideBar, setToggleSideBar] = useState(false);
+
   return (
     <Container>
-      <SideNav />
+      <SideNav
+        setHeaderText={setHeaderText}
+        toggleSideBar={toggleSideBar}
+        setToggleSideBar={setToggleSideBar}
+      />
 
       <ContentContainer>
-        <NavHeader />
+        <NavHeader
+          headerText={headerText}
+          setToggleSideBar={setToggleSideBar}
+          toggleSideBar={toggleSideBar}
+        />
 
         <Content>
           <Outlet />

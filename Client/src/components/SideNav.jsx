@@ -6,13 +6,32 @@ import { MdSpaceDashboard, MdSupportAgent } from "react-icons/md";
 const Sidebar = styled.div`
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding-top: calc(10vh + 1rem);
-  width: 15%;
-  height: 100vh;
-  /* background-color: lightgreen; */
-  display: flex;
   flex-direction: column;
+  gap: 0.5rem;
+  background-color: #4942e4;
+  position: absolute;
+  top: 10vh;
+  width: 100%;
+  height: 90vh;
+  z-index: 999;
+  padding-top: calc(10vh + 1rem);
+
+  /* animation using opacity, transform */
+  transition: all 0.4s ease-in-out;
+  opacity: ${({ $toggleSideBar }) => {
+    return $toggleSideBar ? "1" : "0";
+  }};
+  transform: ${({ $toggleSideBar }) => {
+    return $toggleSideBar ? "translateX(0)" : "translateX(-100%)";
+  }};
+
+  @media (min-width: 1024px) {
+    position: static;
+    width: 20%;
+    height: 100vh;
+    opacity: 1;
+    transform: translateX(0);
+  }
 `;
 
 const Redirect = styled(NavLink)`
@@ -26,24 +45,43 @@ const Redirect = styled(NavLink)`
   font-size: 1.2rem;
   font-weight: 700;
   color: black;
+  background-color: #8696fe;
 
   &:hover {
     background-color: lightgrey;
   }
 `;
 
-const SideNav = () => {
+const SideNav = ({ setHeaderText, toggleSideBar, setToggleSideBar }) => {
   return (
-    <Sidebar>
-      <Redirect to="/">
+    <Sidebar $toggleSideBar={toggleSideBar}>
+      <Redirect
+        to="/"
+        onClick={() => {
+          setHeaderText("DashBoard");
+          setToggleSideBar(false);
+        }}
+      >
         <MdSpaceDashboard />
         <span>Home</span>
       </Redirect>
-      <Redirect to="/about">
+      <Redirect
+        to="/transactions"
+        onClick={() => {
+          setHeaderText("Recent Transactions");
+          setToggleSideBar(false);
+        }}
+      >
         <GrTransaction />
         <span>Transaction</span>
       </Redirect>
-      <Redirect to="/support">
+      <Redirect
+        to="/support"
+        onClick={() => {
+          setHeaderText("Customer Care");
+          setToggleSideBar(false);
+        }}
+      >
         <MdSupportAgent />
         <span>Support</span>
       </Redirect>

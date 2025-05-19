@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import App from "./App.jsx";
 import { createGlobalStyle } from "styled-components";
 import { createBrowserRouter, RouterProvider } from "react-router";
+import Home from "./components/Home";
 
 const GlobalStyle = createGlobalStyle`
   *{
@@ -21,8 +22,8 @@ const router = createBrowserRouter([
     path: "/",
     element: <App />,
     children: [
-      { index: true, path: "/", element: <div>I am home</div> },
-      { path: "/about", element: <div>I am about</div> },
+      { index: true, path: "/", element: <Home /> },
+      { path: "/transactions", element: <div>I am about</div> },
       { path: "/support", element: <div>I am support</div> },
     ],
   },
