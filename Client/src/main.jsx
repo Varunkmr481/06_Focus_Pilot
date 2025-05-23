@@ -6,6 +6,7 @@ import { createBrowserRouter, RouterProvider } from "react-router";
 import Home from "./components/Home";
 import Transactions from "./components/Transactions";
 import About from "./components/About";
+import Support from "./components/Support";
 
 const GlobalStyle = createGlobalStyle`
   *{
@@ -27,7 +28,7 @@ const router = createBrowserRouter([
       { index: true, path: "/", element: <Home /> },
       { path: "/transactions", element: <Transactions /> },
       { path: "/about", element: <About /> },
-      { path: "/support", element: <div>I am support</div> },
+      { path: "/support", element: <Support /> },
     ],
   },
 ]);

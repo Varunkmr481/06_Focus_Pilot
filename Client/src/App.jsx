@@ -2,8 +2,13 @@ import { useState } from "react";
 import { FaCaretDown, FaDownload, FaInfoCircle } from "react-icons/fa";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { GrTransaction } from "react-icons/gr";
+import { IoChatbubble } from "react-icons/io5";
 import {
   MdAccountCircle,
+  MdChat,
+  MdContactMail,
+  MdMail,
+  MdMessage,
   MdSpaceDashboard,
   MdSupportAgent,
 } from "react-icons/md";
@@ -11,6 +16,7 @@ import { NavLink, Outlet } from "react-router";
 import styled from "styled-components";
 import Status from "./components/Status";
 import Transactions from "./components/Transactions";
+import Support from "./components/Support";
 
 const Container = styled.div`
   position: relative;
@@ -155,176 +161,6 @@ const Content = styled.div`
       display: none;
     }
   }
-`;
-
-const GridContentHome = styled.div`
-  display: grid;
-  /* for laptops */
-  grid-template-rows: 10vh 25vh 25vh 10vh 10vh;
-  gap: 3vh;
-  background-color: blue;
-
-  .item_1 {
-    background-color: aqua;
-  }
-
-  .item_2 {
-    background-color: blueviolet;
-  }
-
-  .item_3 {
-    background-color: cadetblue;
-  }
-
-  .item_4 {
-    background-color: coral;
-  }
-
-  .item_5 {
-    background-color: violet;
-  }
-
-  @media (min-width: 320px) {
-    grid-template-rows: 15vh 30vh 30vh 15vh 15vh;
-  }
-
-  @media (min-width: 425px) {
-    grid-template-rows: 15vh 50vh 50vh 15vh 15vh;
-  }
-
-  @media (min-width: 768px) {
-    grid-template-rows: 20vh 55vh 55vh 20vh 20vh;
-  }
-
-  @media (min-width: 1024px) {
-    gap: 3vh;
-    grid-template-columns: auto auto;
-    grid-template-rows: 15vh 40vh 15vh;
-
-    .item_1 {
-      grid-column: 1/3;
-    }
-
-    .item_2 {
-      grid-column: 1/2;
-    }
-
-    .item_3 {
-      grid-column: 2/3;
-    }
-
-    .item_4 {
-      grid-column: 1/2;
-    }
-
-    .item_5 {
-      grid-column: 2/3;
-    }
-  }
-`;
-
-const GridContentTransaction = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 2vh;
-`;
-
-const ExportBtn = styled.button`
-  width: 15%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 1.5vh;
-  border: unset;
-  outline: unset;
-  border-radius: 0.3rem;
-  background-color: #4942e4;
-  color: white;
-  padding: 1.5vh 3vh;
-`;
-
-const Table = styled.div`
-  width: 100%;
-  height: auto;
-  background-color: cornflowerblue;
-  border-radius: 0.9rem 0.9rem 0.9rem 0.9rem;
-`;
-
-const TableType = styled.div`
-  display: flex;
-  align-items: center;
-  border-radius: 0.9rem 0.9rem 0 0;
-
-  .input {
-    background-color: red;
-    margin-left: auto;
-  }
-`;
-
-const TableTypeCell = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1vh;
-  padding: 2vh 3vw;
-  font-weight: 800;
-  border-radius: 0.9rem 0.9rem 0 0;
-
-  &:hover {
-    background-color: darkorchid;
-    cursor: pointer;
-  }
-`;
-
-const TableTypeSticker = styled.div`
-  color: rgb(0, 0, 0);
-  background-color: rgba(206, 204, 204, 0.8);
-  border-radius: 0.7rem;
-  padding: 0.3rem 0.5rem;
-  font-size: 0.6rem;
-  font-weight: 700;
-`;
-
-const TableHeader = styled.div`
-  display: grid;
-  justify-content: center;
-  align-items: center;
-  grid-template-columns: 10vw 20vw 15vw 15vw 6vw;
-  border-top: 1px solid rgba(0, 0, 0, 0.3);
-`;
-
-const TableHeaderCell = styled.div`
-  display: flex;
-  gap: 1vh;
-  padding: 2vh 0;
-  font-weight: 800;
-  border-radius: 0.9rem 0.9rem 0 0;
-`;
-
-const TableBody = styled.div`
-  border-top: 1px solid rgba(0, 0, 0, 0.3);
-`;
-
-const TableRow = styled.div`
-  display: grid;
-  justify-content: center;
-  grid-template-columns: 10vw 20vw 15vw 15vw 6vw;
-`;
-
-const TableRowCell = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 1vh;
-  padding: 2vh 0;
-  font-weight: 800;
-  border-bottom: 0.5px solid rgb(92, 91, 91, 0.3);
-`;
-
-const LightShadeSpan = styled.span`
-  color: rgba(91, 90, 90, 0.4);
-  font-weight: 300;
-  font-size: 0.9rem;
 `;
 
 const App = () => {

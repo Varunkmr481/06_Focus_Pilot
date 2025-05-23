@@ -22,6 +22,8 @@ const Status = ({ statustext }) => {
     statusbgcolor = "rgba(221, 26, 26, 0.8)";
   } else if (statustext.toLowerCase() === "processing") {
     statusbgcolor = "rgba(245,164,12,0.8)";
+  } else {
+    statusbgcolor = "white";
   }
 
   return <StatusSpan $statusbgcolor={statusbgcolor}>{statustext}</StatusSpan>;

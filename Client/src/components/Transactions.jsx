@@ -9,7 +9,6 @@ const GridContentTransaction = styled.div`
   flex-direction: column;
   align-items: flex-end;
   gap: 2vh;
-  /* overflow-x: scroll; */
 `;
 
 const ExportBtn = styled.button`
