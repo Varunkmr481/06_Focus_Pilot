@@ -1,26 +1,42 @@
-import { FaCaretDown, FaDownload } from "react-icons/fa";
+import { FaCaretDown, FaDownload, FaSearch } from "react-icons/fa";
 import styled from "styled-components";
 import Status from "./Status";
+import { useRef, useState } from "react";
+import fakeTransactions from "../data/fakeData";
 
 const GridContentTransaction = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: 2vh;
+  /* overflow-x: scroll; */
 `;
 
 const ExportBtn = styled.button`
-  width: 15%;
+  width: 8rem;
+  gap: 0.5vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 1.5vh;
   border: unset;
   outline: unset;
   border-radius: 0.5rem;
   background-color: #4942e4;
   color: white;
-  padding: 1.8vh 3vh;
+  padding: 1.5vh 0.5vh;
+  font-weight: 700;
+
+  @media (min-width: 425px) {
+    width: 10rem;
+    gap: 0.7vh;
+    padding: 1.8vh 0.8vh;
+  }
+
+  @media (min-width: 768px) {
+    width: 11rem;
+    gap: 0.9vh;
+    padding: 1.8vh 3vh;
+  }
 `;
 
 const Table = styled.div`
@@ -35,9 +51,9 @@ const TableType = styled.div`
   align-items: center;
   border-radius: 0.9rem 0.9rem 0 0;
 
-  .input {
-    background-color: red;
+  .inputCell {
     margin-left: auto;
+    padding: 2vh 3vw;
   }
 `;
 
@@ -46,7 +62,7 @@ const TableTypeCell = styled.div`
   align-items: center;
   justify-content: center;
   gap: 1vh;
-  padding: 2vh 3vw;
+  padding: 3vh 3vw;
   font-weight: 800;
   border-radius: 0.9rem 0.9rem 0 0;
 
@@ -54,6 +70,26 @@ const TableTypeCell = styled.div`
     background-color: darkorchid;
     cursor: pointer;
   }
+`;
+
+const InputContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  color: white;
+  gap: 1vw;
+`;
+
+const Input = styled.input`
+  outline: unset;
+  border: ${({ $inputFocus }) =>
+    $inputFocus ? "2px solid violet" : "2px solid white"};
+  border-radius: 1rem;
+  padding: 0.6rem 0.8rem;
+  width: 13rem;
+  transition: all 0.3s ease-in-out;
+  margin-left: auto;
 `;
 
 const TableTypeSticker = styled.div`
@@ -106,7 +142,14 @@ const LightShadeSpan = styled.span`
   font-size: 0.9rem;
 `;
 
+const onSearchFocus = function (inputRef) {
+  inputRef.current.focus();
+};
+
 const Transactions = () => {
+  const [inputFocus, setInputFocus] = useState(null);
+  const inputRef = useRef(null);
+
   return (
     <GridContentTransaction>
       <ExportBtn>
@@ -115,6 +158,7 @@ const Transactions = () => {
       </ExportBtn>
 
       <Table>
+        {/* FILTER DATA */}
         <TableType>
           <TableTypeCell className="item_1">
             <span>All</span>
@@ -136,9 +180,24 @@ const Transactions = () => {
             <TableTypeSticker>349</TableTypeSticker>
           </TableTypeCell>
 
-          <TableTypeCell className="input">INput</TableTypeCell>
+          <TableTypeCell className="inputCell">
+            <InputContainer>
+              <FaSearch onClick={() => onSearchFocus(inputRef)} />
+              <Input
+                ref={inputRef}
+                type="text"
+                placeholder="Search by ID or destination"
+                onFocus={() => {
+                  setInputFocus(true);
+                }}
+                onBlur={() => setInputFocus(false)}
+                $inputFocus={inputFocus}
+              ></Input>
+            </InputContainer>
+          </TableTypeCell>
         </TableType>
 
+        {/* TABLE HEADER */}
         <TableHeader>
           <TableHeaderCell>ID</TableHeaderCell>
           <TableHeaderCell>
@@ -153,204 +212,30 @@ const Transactions = () => {
           <TableHeaderCell>Status</TableHeaderCell>
         </TableHeader>
 
+        {/* TABLE DATA */}
         <TableBody>
-          <TableRow>
-            <TableRowCell>
-              <span>HD82NA2H</span>
-              <span></span>
-            </TableRowCell>
-            <TableRowCell>
-              <span>2022-06-29</span>
-              <LightShadeSpan>11:06 AM</LightShadeSpan>
-            </TableRowCell>
-            <TableRowCell>
-              <span>INR Withdraw</span>
-              <LightShadeSpan>Wire Transfer</LightShadeSpan>
-            </TableRowCell>
-            <TableRowCell>- ₹81,123.10</TableRowCell>
-            <TableRowCell>
-              <Status
-                statustext="Pending"
-                statusbgcolor="rgba(154,156,159,0.8)"
-              />
-            </TableRowCell>
-          </TableRow>
-
-          <TableRow>
-            <TableRowCell>
-              <span>HD82NA2H</span>
-              <span></span>
-            </TableRowCell>
-            <TableRowCell>
-              <span>2022-06-09</span>
-              <LightShadeSpan>07:06 PM</LightShadeSpan>
-            </TableRowCell>
-            <TableRowCell>
-              <span>INR Deposit</span>
-              <LightShadeSpan>E-Transfer</LightShadeSpan>
-            </TableRowCell>
-            <TableRowCell>+ ₹81,123.10</TableRowCell>
-            <TableRowCell>
-              <Status
-                statustext="Processing"
-                statusbgcolor="rgba(245,164,12,0.8)"
-              />
-            </TableRowCell>
-          </TableRow>
-
-          <TableRow>
-            <TableRowCell>
-              <span>HD82NA2H</span>
-              <span></span>
-            </TableRowCell>
-            <TableRowCell>
-              <span>2022-06-09</span>
-              <LightShadeSpan>07:06 PM</LightShadeSpan>
-            </TableRowCell>
-            <TableRowCell>
-              <span>INR Deposit</span>
-              <LightShadeSpan>E-Transfer</LightShadeSpan>
-            </TableRowCell>
-            <TableRowCell>+ ₹81,123.10</TableRowCell>
-            <TableRowCell>
-              <Status
-                statustext="Cancelled"
-                statusbgcolor="rgba(221, 26, 26, 0.8)"
-              />
-            </TableRowCell>
-          </TableRow>
-
-          <TableRow>
-            <TableRowCell>
-              <span>HD82NA2H</span>
-              <span></span>
-            </TableRowCell>
-            <TableRowCell>
-              <span>2022-06-09</span>
-              <LightShadeSpan>07:06 PM</LightShadeSpan>
-            </TableRowCell>
-            <TableRowCell>
-              <span>INR Deposit</span>
-              <LightShadeSpan>E-Transfer</LightShadeSpan>
-            </TableRowCell>
-            <TableRowCell>+ ₹81,123.10</TableRowCell>
-            <TableRowCell>
-              <Status
-                statustext="Completed"
-                statusbgcolor="rgba(6, 156, 111, 0.8)"
-              />
-            </TableRowCell>
-          </TableRow>
-
-          <TableRow>
-            <TableRowCell>
-              <span>HD82NA2H</span>
-              <span></span>
-            </TableRowCell>
-            <TableRowCell>
-              <span>2022-06-09</span>
-              <LightShadeSpan>07:06 PM</LightShadeSpan>
-            </TableRowCell>
-            <TableRowCell>
-              <span>INR Deposit</span>
-              <LightShadeSpan>E-Transfer</LightShadeSpan>
-            </TableRowCell>
-            <TableRowCell>+ ₹81,123.10</TableRowCell>
-            <TableRowCell>
-              <Status
-                statustext="Completed"
-                statusbgcolor="rgba(6, 156, 111, 0.8)"
-              />
-            </TableRowCell>
-          </TableRow>
-
-          <TableRow>
-            <TableRowCell>
-              <span>HD82NA2H</span>
-              <span></span>
-            </TableRowCell>
-            <TableRowCell>
-              <span>2022-06-09</span>
-              <LightShadeSpan>07:06 PM</LightShadeSpan>
-            </TableRowCell>
-            <TableRowCell>
-              <span>INR Deposit</span>
-              <LightShadeSpan>E-Transfer</LightShadeSpan>
-            </TableRowCell>
-            <TableRowCell>+ ₹81,123.10</TableRowCell>
-            <TableRowCell>
-              <Status
-                statustext="Cancelled"
-                statusbgcolor="rgba(221, 26, 26, 0.8)"
-              />
-            </TableRowCell>
-          </TableRow>
-
-          <TableRow>
-            <TableRowCell>
-              <span>HD82NA2H</span>
-              <span></span>
-            </TableRowCell>
-            <TableRowCell>
-              <span>2022-06-09</span>
-              <LightShadeSpan>07:06 PM</LightShadeSpan>
-            </TableRowCell>
-            <TableRowCell>
-              <span>INR Deposit</span>
-              <LightShadeSpan>E-Transfer</LightShadeSpan>
-            </TableRowCell>
-            <TableRowCell>+ ₹81,123.10</TableRowCell>
-            <TableRowCell>
-              <Status
-                statustext="Completed"
-                statusbgcolor="rgba(6, 156, 111, 0.8)"
-              />
-            </TableRowCell>
-          </TableRow>
-
-          <TableRow>
-            <TableRowCell>
-              <span>HD82NA2H</span>
-              <span></span>
-            </TableRowCell>
-            <TableRowCell>
-              <span>2022-06-09</span>
-              <LightShadeSpan>07:06 PM</LightShadeSpan>
-            </TableRowCell>
-            <TableRowCell>
-              <span>INR Deposit</span>
-              <LightShadeSpan>E-Transfer</LightShadeSpan>
-            </TableRowCell>
-            <TableRowCell>+ ₹81,123.10</TableRowCell>
-            <TableRowCell>
-              <Status
-                statustext="Completed"
-                statusbgcolor="rgba(6, 156, 111, 0.8)"
-              />
-            </TableRowCell>
-          </TableRow>
-
-          <TableRow>
-            <TableRowCell>
-              <span>HD82NA2H</span>
-              <span></span>
-            </TableRowCell>
-            <TableRowCell>
-              <span>2022-06-09</span>
-              <LightShadeSpan>07:06 PM</LightShadeSpan>
-            </TableRowCell>
-            <TableRowCell>
-              <span>INR Deposit</span>
-              <LightShadeSpan>E-Transfer</LightShadeSpan>
-            </TableRowCell>
-            <TableRowCell>+ ₹81,123.10</TableRowCell>
-            <TableRowCell>
-              <Status
-                statustext="Completed"
-                statusbgcolor="rgba(6, 156, 111, 0.8)"
-              />
-            </TableRowCell>
-          </TableRow>
+          {fakeTransactions.map((transaction) => {
+            return (
+              <TableRow key={transaction.transactionId}>
+                <TableRowCell>
+                  <span>{transaction.transactionId}</span>
+                  <span></span>
+                </TableRowCell>
+                <TableRowCell>
+                  <span>{transaction.date}</span>
+                  <LightShadeSpan>{transaction.time}</LightShadeSpan>
+                </TableRowCell>
+                <TableRowCell>
+                  <span>{transaction.type}</span>
+                  <LightShadeSpan>{transaction.method}</LightShadeSpan>
+                </TableRowCell>
+                <TableRowCell>{transaction.amount}</TableRowCell>
+                <TableRowCell>
+                  <Status statustext={transaction.status} />
+                </TableRowCell>
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
     </GridContentTransaction>
