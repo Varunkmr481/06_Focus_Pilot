@@ -11,7 +11,19 @@ const StatusSpan = styled.span`
   color: white;
 `;
 
-const Status = ({ statustext, statusbgcolor }) => {
+const Status = ({ statustext }) => {
+  let statusbgcolor;
+
+  if (statustext.toLowerCase() === "completed") {
+    statusbgcolor = "rgba(6, 156, 111, 0.8)";
+  } else if (statustext.toLowerCase() === "pending") {
+    statusbgcolor = "rgba(154,156,159,0.8)";
+  } else if (statustext.toLowerCase() === "cancelled") {
+    statusbgcolor = "rgba(221, 26, 26, 0.8)";
+  } else if (statustext.toLowerCase() === "processing") {
+    statusbgcolor = "rgba(245,164,12,0.8)";
+  }
+
   return <StatusSpan $statusbgcolor={statusbgcolor}>{statustext}</StatusSpan>;
 };
 

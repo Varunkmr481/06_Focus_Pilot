@@ -1,9 +1,11 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import App from "./App.jsx";
+import App from "./App";
 import { createGlobalStyle } from "styled-components";
 import { createBrowserRouter, RouterProvider } from "react-router";
 import Home from "./components/Home";
+import Transactions from "./components/Transactions";
+import About from "./components/About";
 
 const GlobalStyle = createGlobalStyle`
   *{
@@ -23,7 +25,8 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       { index: true, path: "/", element: <Home /> },
-      { path: "/transactions", element: <div>I am about</div> },
+      { path: "/transactions", element: <Transactions /> },
+      { path: "/about", element: <About /> },
       { path: "/support", element: <div>I am support</div> },
     ],
   },
