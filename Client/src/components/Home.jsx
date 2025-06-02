@@ -8,6 +8,7 @@ import IconButton from "./IconButton";
 import TransactionCard from "./TransactionCard";
 import { useState } from "react";
 import { NavLink } from "react-router";
+import StickerOverlayCard from "./StickerOverlayCard";
 
 const filterOptions = [
   { label: "1H", value: "1h" },
@@ -56,9 +57,9 @@ const recentTransactions = [
 const GridContent = styled.div`
   display: grid;
   /* for laptops */
-  grid-template-rows: 35vh 45vh 40vh 35vh 35vh;
+  grid-template-rows: 35vh 45vh 40vh 20vh 20vh;
   gap: 3vh;
-  background-color: blue;
+  background-color: white;
 
   .item_1 {
     background-color: aqua;
@@ -166,7 +167,7 @@ const GridContent = styled.div`
     display: flex;
     /* justify-content: center; */
     align-items: center;
-    gap: 0.8rem;
+    gap: 0.4rem;
   }
 
   .price_increment {
@@ -222,9 +223,14 @@ const GridContent = styled.div`
   }
 
   .graph_img {
-    background-color: red;
+    height: 5.5rem;
     width: 100%;
-    height: 5rem;
+    background-color: red;
+    background-image: url("./graph.svg");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    display: block;
   }
 
   .item_3 {
@@ -256,16 +262,12 @@ const GridContent = styled.div`
     text-align: center;
   }
 
-  .item_4 {
-    background-color: coral;
-  }
-
   .item_5 {
     background-color: violet;
   }
 
   @media (min-width: 320px) {
-    grid-template-rows: 35vh 47vh 40vh 35vh 35vh;
+    grid-template-rows: 35vh 47vh 40vh 20vh 20vh;
 
     .graph_img {
       height: 6rem;
@@ -273,7 +275,7 @@ const GridContent = styled.div`
   }
 
   @media (min-width: 425px) {
-    grid-template-rows: 35vh 50vh 45vh 35vh 35vh;
+    grid-template-rows: 35vh 50vh 45vh 20vh 20vh;
 
     .graph_img {
       height: 7rem;
@@ -281,7 +283,7 @@ const GridContent = styled.div`
   }
 
   @media (min-width: 525px) {
-    grid-template-rows: 35vh 55vh 45vh 35vh 35vh;
+    grid-template-rows: 35vh 55vh 45vh 20vh 20vh;
 
     .graph_img {
       height: 8rem;
@@ -289,7 +291,7 @@ const GridContent = styled.div`
   }
 
   @media (min-width: 625px) {
-    grid-template-rows: 25vh 50vh 45vh 35vh 35vh;
+    grid-template-rows: 25vh 50vh 45vh 20vh 20vh;
 
     .item_1 {
       flex-direction: row;
@@ -307,7 +309,7 @@ const GridContent = styled.div`
   }
 
   @media (min-width: 768px) {
-    grid-template-rows: 30vh 55vh 55vh 40vh 40vh;
+    grid-template-rows: 30vh 55vh 55vh 20vh 20vh;
 
     .portfolio_wallet_wrapper {
       gap: 1.5rem;
@@ -325,7 +327,7 @@ const GridContent = styled.div`
 
   @media (min-width: 1024px) {
     gap: 3vh;
-    grid-template-columns: 49% 49%;
+    grid-template-columns: 50% auto;
     grid-template-rows: 10vh 45vh 15vh;
 
     .item_1 {
@@ -349,7 +351,7 @@ const GridContent = styled.div`
     }
 
     .btn_box {
-      gap: 1rem;
+      gap: 0.5rem;
     }
 
     .item_2 {
@@ -363,7 +365,7 @@ const GridContent = styled.div`
     }
 
     .price_btn_box {
-      gap: 1rem;
+      gap: 0.5rem;
     }
 
     .price_box {
@@ -471,7 +473,10 @@ const Home = () => {
               </button>
             ))}
           </div>
-          <img className="graph_img" src="./graph.png" alt="crypto graph" />
+
+          {/* <img className="graph_img" src="./graph.svg" alt="crypto graph" /> */}
+          <div className="graph_img"></div>
+
           <div className="time_slots">
             {timeSlots.map((time) => {
               return <div>{time.label}</div>;
@@ -504,8 +509,37 @@ const Home = () => {
         </NavLink>
       </div>
 
-      <div className="item_4">FOOTER 1</div>
-      <div className="item_5">FOOTER 2</div>
+      {/* <div className="item_4">
+        <div className="f_overlay"></div>
+        <div className="f_sticker">Loans</div>
+        <div className="f_content">
+          Learn more about Loans – Keep your Bitcoin, access it’s value without
+          selling it
+        </div>
+      </div> */}
+
+      <StickerOverlayCard
+        className="item_4"
+        sticker_bg="rgb(95, 0, 217)"
+        title="Loans"
+        content="Learn more about Loans – Keep your Bitcoin, access it’s value without
+          selling it"
+        bg_color="orange"
+        overlayImg="./dot_bg.svg"
+      />
+
+      <StickerOverlayCard
+        className="item_5"
+        sticker_bg="#ffffff"
+        sticker_color="rgb(95, 0, 217)"
+        title="Contact"
+        content="Learn more about our real estate, mortgage, and  corporate account services"
+        content_color="white"
+        bg_color="rgb(95, 0, 217)"
+        overlayImg="./grid_bg.svg"
+      />
+
+      {/* <div className="item_5">FOOTER 2</div> */}
     </GridContent>
   );
 };
