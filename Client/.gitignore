@@ -23,5 +23,5 @@ dist-ssr
 *.sln
 *.sw?
 
-# Excluding learning folder
-learning/
+# ignore public folder
+public/
