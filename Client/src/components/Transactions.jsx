@@ -1,8 +1,9 @@
 import { FaCaretDown, FaDownload, FaSearch } from "react-icons/fa";
 import styled from "styled-components";
 import Status from "./Status";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import fakeTransactions from "../data/fakeData";
+import TransactionViewRestriction from "./TransactionViewRestriction";
 
 const GridContentTransaction = styled.div`
   display: flex;
@@ -48,11 +49,13 @@ const Table = styled.div`
 const TableType = styled.div`
   display: flex;
   align-items: center;
+  /* flex-direction: column; */
   border-radius: 0.9rem 0.9rem 0 0;
 
+  /* For laptop, desktop */
   .inputCell {
     margin-left: auto;
-    padding: 2vh 3vw;
+    padding: 1.5vh 1vw;
   }
 `;
 
@@ -61,7 +64,7 @@ const TableTypeCell = styled.div`
   align-items: center;
   justify-content: center;
   gap: 1vh;
-  padding: 3vh 3vw;
+  padding: 3vh 1.5vw;
   font-weight: 800;
   border-radius: 0.9rem 0.9rem 0 0;
 
@@ -69,6 +72,16 @@ const TableTypeCell = styled.div`
     background-color: darkorchid;
     cursor: pointer;
   }
+`;
+
+const TableTypeInputCell = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1vh;
+  padding: 3vh 1.5vw;
+  font-weight: 800;
+  border-radius: 0.9rem 0.9rem 0 0;
 `;
 
 const InputContainer = styled.div`
@@ -102,10 +115,17 @@ const TableTypeSticker = styled.div`
 
 const TableHeader = styled.div`
   display: grid;
-  justify-content: center;
+  padding: 0 2rem;
+  /* justify-content: space-between; */
   align-items: center;
-  grid-template-columns: 10vw 20vw 15vw 15vw 6vw;
+  /* padding: 0 auto; */
+  /* margin: 0 auto; */
+  grid-template-columns: 15vw 20vw 20vw 18vw 12vw;
   border-top: 1px solid rgba(0, 0, 0, 0.3);
+
+  @media (min-width: 1024px) {
+    grid-template-columns: 15vw 15vw 15vw 15vw 8vw;
+  }
 `;
 
 const TableHeaderCell = styled.div`
@@ -122,8 +142,17 @@ const TableBody = styled.div`
 
 const TableRow = styled.div`
   display: grid;
-  justify-content: center;
-  grid-template-columns: 10vw 20vw 15vw 15vw 6vw;
+  /* justify-content: space-between; */
+  grid-template-columns: 15vw 20vw 20vw 18vw 12vw;
+  padding: 0 2rem;
+
+  &:not(:last-child) > * {
+    border-bottom: 0.5px solid rgb(92, 91, 91, 0.3);
+  }
+
+  @media (min-width: 1024px) {
+    grid-template-columns: 15vw 15vw 15vw 15vw 8vw;
+  }
 `;
 
 const TableRowCell = styled.div`
@@ -132,7 +161,6 @@ const TableRowCell = styled.div`
   gap: 1vh;
   padding: 2vh 0;
   font-weight: 800;
-  border-bottom: 0.5px solid rgb(92, 91, 91, 0.3);
 `;
 
 const LightShadeSpan = styled.span`
@@ -147,7 +175,22 @@ const onSearchFocus = function (inputRef) {
 
 const Transactions = () => {
   const [inputFocus, setInputFocus] = useState(null);
+  const [isMobile, setIsMobile] = useState(false);
   const inputRef = useRef(null);
+
+  useEffect(() => {
+    function checkScreenSize() {
+      // console.log(window.innerWidth);
+      setIsMobile(window.innerWidth < 768);
+    }
+
+    // checkscreensize
+    checkScreenSize();
+
+    window.addEventListener("resize", () => checkScreenSize());
+
+    return () => window.removeEventListener("resize", checkScreenSize);
+  }, []);
 
   return (
     <GridContentTransaction>
@@ -156,87 +199,91 @@ const Transactions = () => {
         <span>Export CSV</span>
       </ExportBtn>
 
-      <Table>
-        {/* FILTER DATA */}
-        <TableType>
-          <TableTypeCell className="item_1">
-            <span>All</span>
-            <TableTypeSticker>349</TableTypeSticker>
-          </TableTypeCell>
+      {isMobile ? (
+        <TransactionViewRestriction />
+      ) : (
+        <Table>
+          {/* FILTER DATA */}
+          <TableType>
+            <TableTypeCell className="item_1">
+              <span>All</span>
+              <TableTypeSticker>349</TableTypeSticker>
+            </TableTypeCell>
 
-          <TableTypeCell>
-            <span>Deposit</span>
-            <TableTypeSticker>349</TableTypeSticker>
-          </TableTypeCell>
+            <TableTypeCell>
+              <span>Deposit</span>
+              <TableTypeSticker>349</TableTypeSticker>
+            </TableTypeCell>
 
-          <TableTypeCell>
-            <span>Withdraw</span>
-            <TableTypeSticker>349</TableTypeSticker>
-          </TableTypeCell>
+            <TableTypeCell>
+              <span>Withdraw</span>
+              <TableTypeSticker>349</TableTypeSticker>
+            </TableTypeCell>
 
-          <TableTypeCell>
-            <span>Trade</span>
-            <TableTypeSticker>349</TableTypeSticker>
-          </TableTypeCell>
+            <TableTypeCell>
+              <span>Trade</span>
+              <TableTypeSticker>349</TableTypeSticker>
+            </TableTypeCell>
 
-          <TableTypeCell className="inputCell">
-            <InputContainer>
-              <FaSearch onClick={() => onSearchFocus(inputRef)} />
-              <Input
-                ref={inputRef}
-                type="text"
-                placeholder="Search by ID or destination"
-                onFocus={() => {
-                  setInputFocus(true);
-                }}
-                onBlur={() => setInputFocus(false)}
-                $inputFocus={inputFocus}
-              ></Input>
-            </InputContainer>
-          </TableTypeCell>
-        </TableType>
+            <TableTypeInputCell className="inputCell">
+              <InputContainer>
+                <FaSearch onClick={() => onSearchFocus(inputRef)} />
+                <Input
+                  ref={inputRef}
+                  type="text"
+                  placeholder="Search by ID or destination"
+                  onFocus={() => {
+                    setInputFocus(true);
+                  }}
+                  onBlur={() => setInputFocus(false)}
+                  $inputFocus={inputFocus}
+                ></Input>
+              </InputContainer>
+            </TableTypeInputCell>
+          </TableType>
 
-        {/* TABLE HEADER */}
-        <TableHeader>
-          <TableHeaderCell>ID</TableHeaderCell>
-          <TableHeaderCell>
-            <span>Date & Time</span>
-            <FaCaretDown />
-          </TableHeaderCell>
-          <TableHeaderCell>Type</TableHeaderCell>
-          <TableHeaderCell>
-            <span>Amount</span>
-            <FaCaretDown />
-          </TableHeaderCell>
-          <TableHeaderCell>Status</TableHeaderCell>
-        </TableHeader>
+          {/* TABLE HEADER */}
+          <TableHeader>
+            <TableHeaderCell>ID</TableHeaderCell>
+            <TableHeaderCell>
+              <span>Date & Time</span>
+              <FaCaretDown />
+            </TableHeaderCell>
+            <TableHeaderCell>Type</TableHeaderCell>
+            <TableHeaderCell>
+              <span>Amount</span>
+              <FaCaretDown />
+            </TableHeaderCell>
+            <TableHeaderCell>Status</TableHeaderCell>
+          </TableHeader>
 
-        {/* TABLE DATA */}
-        <TableBody>
-          {fakeTransactions.map((transaction) => {
-            return (
-              <TableRow key={transaction.transactionId}>
-                <TableRowCell>
-                  <span>{transaction.transactionId}</span>
-                  <span></span>
-                </TableRowCell>
-                <TableRowCell>
-                  <span>{transaction.date}</span>
-                  <LightShadeSpan>{transaction.time}</LightShadeSpan>
-                </TableRowCell>
-                <TableRowCell>
-                  <span>{transaction.type}</span>
-                  <LightShadeSpan>{transaction.method}</LightShadeSpan>
-                </TableRowCell>
-                <TableRowCell>{transaction.amount}</TableRowCell>
-                <TableRowCell>
-                  <Status statustext={transaction.status} />
-                </TableRowCell>
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
+          {/* TABLE DATA */}
+          <TableBody>
+            {fakeTransactions.map((transaction) => {
+              return (
+                <TableRow key={transaction.transactionId}>
+                  <TableRowCell>
+                    <span>{transaction.transactionId}</span>
+                    <span></span>
+                  </TableRowCell>
+                  <TableRowCell>
+                    <span>{transaction.date}</span>
+                    <LightShadeSpan>{transaction.time}</LightShadeSpan>
+                  </TableRowCell>
+                  <TableRowCell>
+                    <span>{transaction.type}</span>
+                    <LightShadeSpan>{transaction.method}</LightShadeSpan>
+                  </TableRowCell>
+                  <TableRowCell>{transaction.amount}</TableRowCell>
+                  <TableRowCell>
+                    <Status statustext={transaction.status} />
+                  </TableRowCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      )}
     </GridContentTransaction>
   );
 };
