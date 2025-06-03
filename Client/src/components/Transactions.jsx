@@ -21,7 +21,7 @@ const ExportBtn = styled.button`
   border: unset;
   outline: unset;
   border-radius: 0.5rem;
-  background-color: #4942e4;
+  background-color: #5f00d9;
   color: white;
   padding: 1.5vh 0.5vh;
   font-weight: 700;
@@ -42,7 +42,8 @@ const ExportBtn = styled.button`
 const Table = styled.div`
   width: 100%;
   height: auto;
-  background-color: cornflowerblue;
+  background-color: #5f00d9;
+  color: white;
   border-radius: 0.9rem 0.9rem 0.9rem 0.9rem;
 `;
 
@@ -69,7 +70,7 @@ const TableTypeCell = styled.div`
   border-radius: 0.9rem 0.9rem 0 0;
 
   &:hover {
-    background-color: darkorchid;
+    background-color: rgb(139, 50, 255);
     cursor: pointer;
   }
 `;
@@ -164,7 +165,8 @@ const TableRowCell = styled.div`
 `;
 
 const LightShadeSpan = styled.span`
-  color: rgba(91, 90, 90, 0.4);
+  /* color: rgba(91, 90, 90, 0.4); */
+  color: rgba(255, 255, 255, 0.8);
   font-weight: 300;
   font-size: 0.9rem;
 `;

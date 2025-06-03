@@ -27,7 +27,7 @@ const TransactCard = styled.div`
     align-items: center;
     border-radius: 50%;
     padding: 0.5rem;
-    background-color: rgb(197, 193, 193);
+    background-color: rgb(236, 236, 236);
   }
 
   .t_card_amount {

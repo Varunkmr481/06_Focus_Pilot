@@ -3,17 +3,17 @@ import { MdMail } from "react-icons/md";
 import styled from "styled-components";
 
 const ContentSupportContainer = styled.div`
-  background-color: plum;
+  /* background-color: plum; */
   width: 100%;
 `;
 
 const GridSupportContainer = styled.div`
   display: grid;
   grid-template-columns: 100%;
-  grid-template-rows: 25vh 70vh 25vh 25vh;
+  grid-template-rows: 20vh 70vh 20vh 20vh;
   row-gap: 5vh;
 
-  .item-1,
+  /* .item-1,
   .item-3 {
     background-color: aqua;
   }
@@ -21,7 +21,7 @@ const GridSupportContainer = styled.div`
   .item-2,
   .item-4 {
     background-color: lightskyblue;
-  }
+  } */
 
   .item-1 {
     display: flex;
@@ -37,10 +37,11 @@ const GridSupportContainer = styled.div`
     flex-direction: column;
     justify-content: center;
     gap: 22px;
-    border: 2px solid red;
+    border: 2px solid #5f00d9;
     border-radius: 1rem;
     padding: 1.5vh 2vh;
     box-sizing: border-box;
+    background-color: white;
   }
 
   .item-3 {

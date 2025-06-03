@@ -7,7 +7,7 @@ const Currency = styled.span`
   font-weight: 800;
   border-radius: 10rem;
   color: #797e82;
-  background-color: rgb(218, 215, 215);
+  background-color: rgb(227, 227, 227);
 `;
 
 const CurrencyTag = function ({ children }) {

@@ -57,14 +57,20 @@ const recentTransactions = [
 const GridContent = styled.div`
   display: grid;
   /* for laptops */
-  grid-template-rows: 35vh 45vh 40vh 20vh 20vh;
+  grid-template-rows: 35vh 45vh 42vh 20vh 20vh;
   gap: 3vh;
-  background-color: white;
+  background-color: transparent;
+
+  .item_1,
+  .item_2,
+  .item_3 {
+    border-radius: 1rem;
+  }
 
   .item_1 {
-    background-color: aqua;
+    background-color: white;
     display: flex;
-    padding: 0.8rem 0;
+    padding: 0.8rem 0.8rem;
     /* justify-content: space-around; */
     justify-content: space-between;
     flex-direction: column;
@@ -135,11 +141,12 @@ const GridContent = styled.div`
 
   .item_2 {
     display: flex;
-    padding: 0.8rem 0;
+    padding: 0.8rem 0.8rem;
     flex-direction: column;
     /* justify-content: space-between; */
     gap: 1.5rem;
-    background-color: blueviolet;
+    /* background-color: blueviolet; */
+    background-color: white;
     height: 100%;
   }
 
@@ -190,13 +197,14 @@ const GridContent = styled.div`
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-    padding: 0 0.5rem;
+    /* padding: 0 0.5rem; */
   }
 
   .filter_box {
     display: flex;
     align-items: center;
     /* justify-content: center; */
+    background-color: rgb(236, 236, 236);
     width: fit-content;
     padding: 0.3rem 0.4rem;
     margin: 0 0 0 auto;
@@ -209,10 +217,18 @@ const GridContent = styled.div`
     border: unset;
     padding: 0.4rem 0.5rem;
     border-radius: 0.4rem;
+    background-color: white;
+
+    &:hover {
+      cursor: pointer;
+      font-weight: 700;
+    }
   }
 
   .active {
-    background-color: red;
+    background-color: #5f00d9;
+    color: white;
+    font-weight: 700;
   }
 
   .time_slots {
@@ -225,7 +241,7 @@ const GridContent = styled.div`
   .graph_img {
     height: 5.5rem;
     width: 100%;
-    background-color: red;
+    /* background-color: red; */
     background-image: url("./graph.svg");
     background-repeat: no-repeat;
     background-position: center;
@@ -234,9 +250,10 @@ const GridContent = styled.div`
   }
 
   .item_3 {
-    background-color: cadetblue;
+    /* background-color: cadetblue; */
+    background-color: white;
     display: flex;
-    padding: 0.8rem 0;
+    padding: 0.8rem 0.8rem;
     justify-content: space-between;
     flex-direction: column;
   }
@@ -256,7 +273,7 @@ const GridContent = styled.div`
     font-weight: 600;
     border-radius: 0.4rem;
     padding: 0.5rem 0;
-    background-color: rgb(197, 193, 193);
+    background-color: rgb(236, 236, 236);
     text-decoration: none;
     color: black;
     text-align: center;
@@ -267,7 +284,7 @@ const GridContent = styled.div`
   }
 
   @media (min-width: 320px) {
-    grid-template-rows: 35vh 47vh 40vh 20vh 20vh;
+    grid-template-rows: 35vh 47vh 42vh 20vh 20vh;
 
     .graph_img {
       height: 6rem;
@@ -309,7 +326,7 @@ const GridContent = styled.div`
   }
 
   @media (min-width: 768px) {
-    grid-template-rows: 30vh 55vh 55vh 20vh 20vh;
+    grid-template-rows: 30vh 55vh 47vh 20vh 20vh;
 
     .portfolio_wallet_wrapper {
       gap: 1.5rem;
@@ -328,7 +345,7 @@ const GridContent = styled.div`
   @media (min-width: 1024px) {
     gap: 3vh;
     grid-template-columns: 50% auto;
-    grid-template-rows: 10vh 45vh 15vh;
+    grid-template-rows: 10.5vh 45.5vh 15vh;
 
     .item_1 {
       grid-column: 1/3;
