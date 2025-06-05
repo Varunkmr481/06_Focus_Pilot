@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { NavLink } from "react-router";
 import styled from "styled-components";
+import toast, { Toaster } from "react-hot-toast";
 
 const WelcomeWrapper = styled.div`
   height: 100vh;
@@ -13,20 +15,15 @@ const WelcomeWrapper = styled.div`
     border-radius: 1rem;
     box-shadow: #5f00d9 1px 3px 20px 0.5px;
 
-    /* height: 70vh; */
-    margin: 0 0.6rem;
+    margin: 0 0.2rem;
     display: flex;
     flex-direction: column;
-    /* align-items: center; */
     justify-content: center;
     gap: 1.3rem;
-    /* height: 85%; */
     height: auto;
-    /* background-color: lightseagreen; */
     background-color: white;
     width: 20rem;
     padding: 0.8rem;
-    /* padding: 1.5vh 2vh; */
     width: 100%;
   }
 
@@ -46,13 +43,11 @@ const WelcomeWrapper = styled.div`
   .welcome-subtitle {
     font-size: 0.8rem;
     color: rgb(157, 157, 157);
-    /* color: red; */
   }
 
   .welcome-content {
     display: flex;
     flex-direction: column;
-    /* align-items: center; */
     justify-content: center;
     gap: 0.5rem;
   }
@@ -77,10 +72,6 @@ const FormLayout = styled.div`
   flex-direction: column;
   gap: 10px;
   justify-content: center;
-
-  @media (min-width: 768px) {
-    /* gap: 24px; */
-  }
 `;
 
 const FormRow = styled.div`
@@ -139,7 +130,7 @@ const AgreementWrapper = styled.div`
 
   @media (min-width: 768px) {
     font-size: 1rem;
-    gap: 0.8rem;
+    gap: 0.6rem;
   }
 `;
 
@@ -156,7 +147,8 @@ const FormBtnWrapper = styled.div`
   }
 `;
 
-const FormBtn = styled.div`
+const FormBtn = styled.button`
+  border: unset;
   width: 100%;
   background-color: #5f00d9;
   border-radius: 0.6rem;
@@ -196,6 +188,58 @@ const StyledNavlink = styled(NavLink)`
 `;
 
 const SignUp = () => {
+  const [name, setName] = useState("");
+  const [surname, setSurname] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isFormChecked, setIsFormChecked] = useState(false);
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+
+    const data = { name, surname, email, password, confirmPassword };
+    console.log(data);
+
+    // 1. Check if agree to T&C
+    if (!isFormChecked) {
+      toast.error("Please agree to T&C");
+      return;
+    }
+
+    // 2. Check if passwords do not match
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match!");
+      // alert("password do not match");
+      return;
+    }
+
+    try {
+      // 2. Send response with data to backened
+      const response = await fetch("http://localhost:8000/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      console.log(response);
+
+      const result = await response.json();
+
+      // 3. Handle response
+      if (response.ok) {
+        toast.success("Verification email sent. Please check your inbox.");
+      } else {
+        toast.error(result.message || "Something went wrong");
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error(err.message || "Something went wrong 💥");
+    }
+  }
+
   return (
     <WelcomeWrapper>
       <div className="welcome-box">
@@ -207,7 +251,7 @@ const SignUp = () => {
         </div>
 
         <div className="welcome-content">
-          <Form>
+          <Form onSubmit={handleSubmit}>
             <ContactFormMessage>
               You will receive response within 24 hours of time of submit.
             </ContactFormMessage>
@@ -217,18 +261,40 @@ const SignUp = () => {
               <FormRow>
                 <FormField>
                   <label htmlFor="name">Name</label>
-                  <input type="text" name="for" id="name" />
+                  <input
+                    type="text"
+                    name="name"
+                    id="name"
+                    onChange={(e) => {
+                      setName(e.target.value);
+                    }}
+                  />
                 </FormField>
+
                 <FormField>
                   <label htmlFor="surname">Surname</label>
-                  <input type="text" name="surname" id="surname"></input>
+                  <input
+                    type="text"
+                    name="surname"
+                    id="surname"
+                    onChange={(e) => {
+                      setSurname(e.target.value);
+                    }}
+                  ></input>
                 </FormField>
               </FormRow>
 
               <FormRow>
                 <FormField $width="100%">
                   <label htmlFor="email">Email</label>
-                  <input type="text" name="email" id="email"></input>
+                  <input
+                    type="email"
+                    name="email"
+                    id="email"
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                    }}
+                  ></input>
                 </FormField>
               </FormRow>
 
@@ -239,6 +305,10 @@ const SignUp = () => {
                     type="password"
                     name="password"
                     id="password"
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                    }}
+                    autoComplete="new-password"
                     required
                   ></input>
                 </FormField>
@@ -251,6 +321,10 @@ const SignUp = () => {
                     type="password"
                     name="repeatpass"
                     id="repeatpass"
+                    onChange={(e) => {
+                      setConfirmPassword(e.target.value);
+                    }}
+                    autoComplete="new-password"
                     required
                   ></input>
                 </FormField>
@@ -260,7 +334,15 @@ const SignUp = () => {
             {/* form end */}
 
             <AgreementWrapper>
-              <input type="checkbox" id="check" name="check"></input>
+              <input
+                type="checkbox"
+                id="check"
+                name="check"
+                onChange={() => {
+                  setIsFormChecked((prev) => !prev);
+                }}
+              ></input>
+
               <label htmlFor="check">
                 I agree with <span id="aggrement">Terms & Conditions.</span>
               </label>
@@ -279,6 +361,8 @@ const SignUp = () => {
           </AuthRedirectText>
         </div>
       </div>
+
+      <Toaster />
     </WelcomeWrapper>
   );
 };
