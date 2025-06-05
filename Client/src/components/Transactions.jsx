@@ -111,7 +111,8 @@ const TableTypeSticker = styled.div`
   border-radius: 0.7rem;
   padding: 0.3rem 0.5rem;
   font-size: 0.6rem;
-  font-weight: 700;
+  font-weight: 800;
+  /* color: #ffffff; */
 `;
 
 const TableHeader = styled.div`

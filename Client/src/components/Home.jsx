@@ -495,8 +495,8 @@ const Home = () => {
           <div className="graph_img"></div>
 
           <div className="time_slots">
-            {timeSlots.map((time) => {
-              return <div>{time.label}</div>;
+            {timeSlots.map((time, index) => {
+              return <div key={index}>{time.label}</div>;
             })}
           </div>
         </div>
