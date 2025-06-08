@@ -1,22 +1,19 @@
 import { useState } from "react";
-import { FaCaretDown, FaDownload, FaInfoCircle } from "react-icons/fa";
+import { FaInfoCircle, FaUser } from "react-icons/fa";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { GrTransaction } from "react-icons/gr";
-import { IoChatbubble } from "react-icons/io5";
+import { IoChatbubble, IoSettings } from "react-icons/io5";
 import {
-  MdAccountCircle,
-  MdChat,
-  MdContactMail,
   MdMail,
-  MdMessage,
   MdSpaceDashboard,
   MdSupportAgent,
+  MdAccountCircle,
 } from "react-icons/md";
 import { NavLink, Outlet } from "react-router";
 import styled from "styled-components";
-import Status from "./components/Status";
-import Transactions from "./components/Transactions";
-import Support from "./components/Support";
+import UserDropDown from "./components/UserDropDown";
+import { RiLogoutBoxRFill } from "react-icons/ri";
+import { Toaster } from "react-hot-toast";
 
 const Container = styled.div`
   position: relative;
@@ -40,6 +37,9 @@ const Container = styled.div`
 const Sidebar = styled.div`
   width: 100vw;
   height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   position: absolute;
   top: 0;
   left: 0;
@@ -59,6 +59,15 @@ const Sidebar = styled.div`
     width: 20vw;
     height: auto;
     transform: none;
+  }
+`;
+
+const Credit = styled.div`
+  font-size: 0.8rem;
+  font-weight: 700;
+
+  .credit_link {
+    text-decoration: none;
   }
 `;
 
@@ -626,6 +635,27 @@ const navLinks = [
   },
 ];
 
+const avatarMenuItems = [
+  {
+    label: "Profile",
+    icon: <FaUser />,
+    action: () => console.log("Go to Profile"),
+    to: "/transactions",
+  },
+  {
+    label: "Settings",
+    icon: <IoSettings />,
+    action: () => console.log("Open Settings"),
+    to: "/transactions",
+  },
+  {
+    label: "Logout",
+    icon: <RiLogoutBoxRFill />,
+    action: () => console.log("Logout User"),
+    to: "/transactions",
+  },
+];
+
 const App = () => {
   const [headerText, setHeaderText] = useState("DashBoard");
   const [showSideBar, setShowSideBar] = useState(false);
@@ -651,6 +681,16 @@ const App = () => {
             );
           })}
         </SidebarMenu>
+
+        <Credit>
+          Credit : design by
+          <NavLink
+            to="https://www.youtube.com/@dosomecoding"
+            className="credit_link"
+          >
+            @DoSomeCoding❤️
+          </NavLink>
+        </Credit>
       </Sidebar>
 
       <ContentContainer $showSideBar={showSideBar}>
@@ -660,13 +700,19 @@ const App = () => {
             onClick={() => setShowSideBar((prev) => !prev)}
           />
           <div>{headerText}</div>
-          <MdAccountCircle />
+
+          <UserDropDown
+            avatarMenuItems={avatarMenuItems}
+            userAvatar={<MdAccountCircle />}
+          />
         </Navbar>
 
         <Content>
           <Outlet />
         </Content>
       </ContentContainer>
+
+      <Toaster />
     </Container>
   );
 };

@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { NavLink } from "react-router";
+import { NavLink, useNavigate } from "react-router";
 import styled from "styled-components";
+import Loader from "./Loader";
 import toast, { Toaster } from "react-hot-toast";
 
 const WelcomeWrapper = styled.div`
@@ -194,27 +195,28 @@ const SignUp = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isFormChecked, setIsFormChecked] = useState(false);
+  const navigate = useNavigate();
 
   async function handleSubmit(e) {
     e.preventDefault();
 
-    const data = { name, surname, email, password, confirmPassword };
-    console.log(data);
-
-    // 1. Check if agree to T&C
-    if (!isFormChecked) {
-      toast.error("Please agree to T&C");
-      return;
-    }
-
-    // 2. Check if passwords do not match
-    if (password !== confirmPassword) {
-      toast.error("Passwords do not match!");
-      // alert("password do not match");
-      return;
-    }
-
     try {
+      const data = { name, surname, email, password, confirmPassword };
+      console.log(data);
+
+      // 1. Check if agree to T&C
+      if (!isFormChecked) {
+        toast.error("Please agree to T&C");
+        return;
+      }
+
+      // 2. Check if passwords do not match
+      if (password !== confirmPassword) {
+        toast.error("Passwords do not match!");
+        // alert("password do not match");
+        return;
+      }
+
       // 2. Send response with data to backened
       const response = await fetch("http://localhost:8000/register", {
         method: "POST",
@@ -231,11 +233,15 @@ const SignUp = () => {
       // 3. Handle response
       if (response.ok) {
         toast.success("Verification email sent. Please check your inbox.");
+        navigate("/verify-email", {
+          state: { email },
+        });
       } else {
+        // console.log("ERROR")
         toast.error(result.message || "Something went wrong");
       }
     } catch (err) {
-      console.log(err);
+      console.log("catch err : ", err);
       toast.error(err.message || "Something went wrong 💥");
     }
   }

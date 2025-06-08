@@ -7,6 +7,47 @@ import Home from "./components/Home";
 import Transactions from "./components/Transactions";
 import About from "./components/About";
 import Support from "./components/Support";
+// import Welcome from "./components/Welcome";
+import SuccessNotification from "./components/SuccessNotification";
+import SignIn from "./components/SignIn";
+import SignUp from "./components/SignUp";
+import ForgotPassword from "./components/ForgotPassword";
+import ResetPassword from "./components/ResetPassword";
+import VerifyEmail from "./components/VerifyEmail";
+
+// Password Reset Done
+/* <SuccessNotification
+  icon={<img src="./tick.png" alt="tick" />}
+  title="Password Reset Done"
+  subtitle="Now you can access you account."
+  to="https://www.google.com"
+  btntext="Sign In"
+/>; */
+
+// Email Verification
+/* <SuccessNotification
+  icon={<img src="./mail.png" />}
+  title="Email Verification"
+  subtitle="We have sent you an email verification to  jenny.wilson@gmail.com. If you didn’t receive it, click the button below."
+  btntext="Re-Send Email"
+/> */
+
+// Successfully Registered
+/* <SuccessNotification
+  icon={<img src="tick.png" />}
+  title="Successfully Registration"
+  subtitle="Hurray! You have successfully created your account. Enter the app to explore all it’s features."
+  btntext="Enter the App"
+/> */
+
+// Password Reset Sent
+/* <SuccessNotification
+  icon={<img src="tick.png" />}
+  title="Successfully Sent"
+  subtitle="We have sent instructions on how to reset your password to jenny.wilson@gmail.com. Please follow the instructions from the email."
+  btntext="Enter the App"
+  btn={false}
+/> */
 
 const GlobalStyle = createGlobalStyle`
   *{
@@ -21,15 +62,20 @@ const GlobalStyle = createGlobalStyle`
 `;
 
 const router = createBrowserRouter([
+  { path: "/signup", element: <SignUp /> },
   {
     path: "/",
     element: <App />,
     children: [
-      { index: true, path: "/", element: <Home /> },
+      { index: true, element: <Home /> },
       { path: "/transactions", element: <Transactions /> },
       { path: "/about", element: <About /> },
       { path: "/support", element: <Support /> },
     ],
+  },
+  {
+    path: "/verify-email",
+    element: <VerifyEmail />,
   },
 ]);
 
