@@ -6,9 +6,11 @@ const User = require("./model/User");
 const connectDB = require("./db");
 const sendEmail = require("./sendEmail");
 const jwt = require("jsonwebtoken");
+const router = require("./routes/AuthRouter");
+const Authrouter = require("./routes/AuthRouter");
+const cryptoRouter = require("./routes/CryptoRouter");
 const app = express();
 const port = 8000;
-const saltRounds = 10;
 
 app.use(express.json());
 app.use(cors());
@@ -50,114 +52,119 @@ app.delete("/all", async (req, res) => {
   }
 });
 
-app.post("/register", async (req, res) => {
-  const { name, surname, email, password, confirmPassword } = req.body;
-  console.log("data", req.body);
+app.use("/", Authrouter);
+app.use("/home", cryptoRouter);
 
-  // 1. Validate inputs
-  if (!name || !surname || !email || !password || !confirmPassword) {
-    return res.status(400).json({
-      message: "All fields are required!",
-    });
-  }
+// app.post("/register", async (req, res) => {
+//   const { name, surname, email, password, confirmPassword } = req.body;
+//   console.log("data", req.body);
 
-  // 2. Validate password matches
-  if (password !== confirmPassword) {
-    return res.status(400).json({
-      message: "Passwords do not match!",
-    });
-  }
+//   // 1. Validate inputs
+//   if (!name || !surname || !email || !password || !confirmPassword) {
+//     return res.status(400).json({
+//       message: "All fields are required!",
+//     });
+//   }
 
-  // 3. Check if user already exists
-  const userExists = await User.findOne({ email });
+//   // 2. Validate password matches
+//   if (password !== confirmPassword) {
+//     return res.status(400).json({
+//       message: "Passwords do not match!",
+//     });
+//   }
 
-  if (userExists) {
-    // returns null if no user found
-    console.log("Finding user : ", userExists);
+//   // 3. Check if user already exists
+//   const userExists = await User.findOne({ email });
 
-    return res.status(400).json({
-      message: `User already exists`,
-    });
-  }
+//   if (userExists) {
+//     // returns null if no user found
+//     console.log("Finding user : ", userExists);
 
-  // 4. Hash password with bcrypt
-  const hashedPassword = await bcrypt.hash(password, saltRounds);
-  console.log(hashedPassword);
+//     return res.status(400).json({
+//       message: `User already exists`,
+//     });
+//   }
 
-  // 5. Create new user
-  const newUser = await User.create({
-    name,
-    email,
-    password: hashedPassword,
-    verified: false,
-  });
+//   // 4. Hash password with bcrypt
+//   const hashedPassword = await bcrypt.hash(password, saltRounds);
+//   console.log(hashedPassword);
 
-  // 6. Create a Verification Token
-  const token = jwt.sign(
-    { id: newUser._id, email: newUser.email },
-    process.env.JWT_SECRET,
-    {
-      expiresIn: "15m",
-    }
-  );
+//   // 5. Create new user
+//   const newUser = await User.create({
+//     name,
+//     email,
+//     password: hashedPassword,
+//     verified: false,
+//   });
 
-  // 7. Send verification email
-  const verificationUrl = `http://localhost:8000/verify-email/${token}`;
+//   // 6. Create a Verification Token
+//   const token = jwt.sign(
+//     { id: newUser._id, email: newUser.email },
+//     process.env.JWT_SECRET,
+//     {
+//       expiresIn: "15m",
+//     }
+//   );
 
-  await sendEmail(
-    email,
-    "Verify your email",
-    `<div style="font-family: Arial, sans-serif; color: #333; display:flex; flex-direction:column; gap:30px">
-      <div style="display : flex; flex-direction:column; justify-content : center;align-items : center; gap: 5px">
-        <h3>Welcome to Crypto App 👋</h3>
-        <p>Please click the button below to verify your email address:</p>
-        <a 
-        href=${verificationUrl}
-        style="display: inline-block;padding: 10px 20px;background-color: #5f00d9;color: white;text-decoration: none;border-radius: 5px;font-weight: bold;
-        ">Verify Email</a>
-        <p>If you didn&apos;t request this, you can ignore this email.</p>
-      </div>
-  
-      <div style="color: grey; display : flex; flex-direction : column; gap: 5px;">
-        <div>Warm regards,</div>
-        <div>-Varun kumar</div>
-      </div>
-    </div>`
-  );
+//   // 7. Send verification email
+//   const verificationUrl = `http://localhost:8000/verify-email/${token}`;
 
-  res
-    .status(200)
-    .json({ message: "Registration successful. Please verify your email." });
-});
+//   await sendEmail(
+//     email,
+//     "Verify your email",
+//     `<div style="font-family: Arial, sans-serif; color: #333; display:flex; flex-direction:column; gap:30px">
+//       <div style="display : flex; flex-direction:column; justify-content : center;align-items : center; gap: 5px">
+//         <h3>Welcome to Crypto App 👋</h3>
+//         <p>Please click the button below to verify your email address:</p>
+//         <a
+//         href=${verificationUrl}
+//         style="display: inline-block;padding: 10px 20px;background-color: #5f00d9;color: white;text-decoration: none;border-radius: 5px;font-weight: bold;
+//         ">Verify Email</a>
+//         <p>If you didn&apos;t request this, you can ignore this email.</p>
+//       </div>
 
-app.get("/verify-email/:token", async (req, res) => {
-  try {
-    const { token } = req.params;
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    // console.log(decoded);
-    const user = await User.findById({ _id: decoded.id });
-    console.log("user", user);
+//       <div style="color: grey; display : flex; flex-direction : column; gap: 5px;">
+//         <div>Warm regards,</div>
+//         <div>-Varun kumar</div>
+//       </div>
+//     </div>`
+//   );
 
-    if (!user) {
-      return res.status(400).json({
-        message: "Invalid or expired token",
-      });
-    }
+//   res
+//     .status(200)
+//     .json({ message: "Registration successful. Please verify your email." });
+// });
 
-    if (user.verified) {
-      return res.redirect("http://localhost:5173/email-already-verified");
-    }
+// app.get("/verify-email/:token", async (req, res) => {
+//   try {
+//     const { token } = req.params;
+//     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+//     // console.log(decoded);
+//     const user = await User.findById({ _id: decoded.id });
+//     console.log("user", user);
 
-    user.verified = true;
-    await user.save();
+//     if (!user) {
+//       return res.status(400).json({
+//         message: "Invalid or expired token",
+//       });
+//     }
 
-    return res.redirect("http://localhost:5173");
-  } catch (err) {
-    return res.status(400).json({
-      message: err.message,
-    });
-  }
-});
+//     if (user.verified) {
+//       return res.redirect("http://localhost:5173/email-already-verified");
+//     }
+
+//     user.verified = true;
+//     await user.save();
+
+//     return res.redirect("http://localhost:5173/home");
+//   } catch (err) {
+//     return res.status(400).json({
+//       message: err.message,
+//     });
+//   }
+// });
+
+// app.post("/signin", (req, res) => {});
 
 app.listen(process.env.PORT, () => {
   console.log("Server running on port ", port);
