@@ -72,8 +72,16 @@ const signup = async (req, res) => {
       .status(200)
       .json({ message: "Registration successful. Please verify your email." });
   } catch (err) {
+    if (err.code === 11000) {
+      return res.status(409).json({
+        message: "User already exists (duplicate email)",
+        location: "AuthController/signup/catch",
+        error: err.message,
+      });
+    }
+
     return res.status(500).json({
-      message: "bad request",
+      message: "Internal server error",
       location: "AuthController/signup/catch",
       error: err.message,
     });
@@ -111,7 +119,7 @@ const verifyEmail = async (req, res) => {
     await user.save();
 
     // 7. redirect to homepage
-    return res.redirect("http://localhost:5173/home");
+    return res.redirect("http://localhost:5173/login");
   } catch (err) {
     return res.status(400).json({
       message: err.message,
@@ -165,6 +173,8 @@ const login = async (req, res) => {
       surname: user.surname,
     });
   } catch (err) {
+    console.log("Server error : ", err);
+
     return res.status(500).json({
       message: "Internal server error",
       error: err.message,

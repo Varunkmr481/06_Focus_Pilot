@@ -7,6 +7,10 @@ const AvatarWrapper = styled.div`
 `;
 
 const AvatarImage = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
   &:hover {
     cursor: pointer;
   }
@@ -15,8 +19,8 @@ const AvatarImage = styled.div`
 const AvatarDropDownMenu = styled.div`
   border: 2px solid black;
   position: absolute;
-  right: 48%;
-  top: 80%;
+  right: 11%;
+  top: 100%;
 `;
 
 const AvatarDropDownItem = styled(NavLink)`
@@ -37,9 +41,26 @@ const AvatarDropDownItem = styled(NavLink)`
     cursor: pointer;
   }
 `;
-const UserDropDown = ({ avatarMenuItems, userAvatar }) => {
+
+const AvatarInfo = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.6rem;
+`;
+
+const AvatarName = styled.div`
+  font-size: 1.2rem;
+`;
+
+const UserDropDown = ({
+  avatarMenuItems,
+  userAvatar,
+  // loggedInUser = "user",
+}) => {
   const [isAvatarClick, setIsAvatarClick] = useState(false);
   const avatarRef = useRef(null);
+  const [loggedInUser, setLoggedInUser] = useState("user");
   console.log("avatarMenuItems", avatarMenuItems);
 
   useEffect(() => {
@@ -56,47 +77,47 @@ const UserDropDown = ({ avatarMenuItems, userAvatar }) => {
     };
   }, []);
 
+  useEffect(() => {
+    const loggedUser = localStorage.getItem("user");
+    // console.log(loggedUser);
+
+    if (loggedUser) {
+      setLoggedInUser(
+        loggedUser.charAt(0).toUpperCase() + loggedUser.slice(1).toLowerCase()
+      );
+    }
+  }, []);
+
   return (
-    <AvatarWrapper
-      ref={avatarRef}
-      onClick={() => {
-        setIsAvatarClick((prev) => !prev);
-      }}
-    >
-      <AvatarImage>{userAvatar}</AvatarImage>
+    <AvatarWrapper>
+      <AvatarInfo>
+        <AvatarName>Hello, {loggedInUser}</AvatarName>
+        {/* {userAvatar} */}
+        <AvatarImage
+          ref={avatarRef}
+          onClick={() => {
+            setIsAvatarClick((prev) => !prev);
+          }}
+        >
+          {userAvatar}
+        </AvatarImage>
+      </AvatarInfo>
 
       {/* <AvatarTriangle /> */}
       {isAvatarClick && (
         <AvatarDropDownMenu>
           {avatarMenuItems.map((menuItem, index) => {
             return (
-              <AvatarDropDownItem key={index} to={menuItem.to || "/"}>
+              <AvatarDropDownItem
+                key={index}
+                to={menuItem?.to}
+                onClick={menuItem.action}
+              >
                 <span>{menuItem.icon}</span>
                 <span>{menuItem.label}</span>
               </AvatarDropDownItem>
             );
           })}
-
-          {/* <AvatarDropDownItem>
-            <span>
-              <FaUser />
-            </span>
-            <span>Profile</span>
-          </AvatarDropDownItem>
-
-          <AvatarDropDownItem>
-            <span>
-              <IoSettings />
-            </span>
-            <span>Settings</span>
-          </AvatarDropDownItem>
-
-          <AvatarDropDownItem>
-            <span>
-              <RiLogoutBoxRFill />
-            </span>
-            <span>Logout</span>
-          </AvatarDropDownItem> */}
         </AvatarDropDownMenu>
       )}
     </AvatarWrapper>

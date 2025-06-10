@@ -38,7 +38,7 @@ const loginValidation = (req, res, next) => {
   if (error) {
     return res.status(400).json({
       message: "Bad request",
-      error: error,
+      error: error.details[0].message,
     });
   }
 
@@ -79,7 +79,12 @@ const EmailNotVerifiedValidation = async (req, res, next) => {
 
       next();
     }
-  } catch (err) {}
+  } catch (err) {
+    res.status(500).json({
+      message: "Internal server error",
+      error: err.message,
+    });
+  }
 };
 
 module.exports = {
