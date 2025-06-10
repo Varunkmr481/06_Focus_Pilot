@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router";
 import styled from "styled-components";
-import Loader from "./Loader";
 import toast, { Toaster } from "react-hot-toast";
 
 const WelcomeWrapper = styled.div`
@@ -204,20 +203,22 @@ const SignUp = () => {
       const data = { name, surname, email, password, confirmPassword };
       console.log(data);
 
+      // 0. Check if all fields entered
+      if (!name || !email || !password || !confirmPassword) {
+        return toast.error("Please fill in all the required fields.");
+      }
+
       // 1. Check if agree to T&C
       if (!isFormChecked) {
-        toast.error("Please agree to T&C");
-        return;
+        return toast.error("Please agree to T&C");
       }
 
       // 2. Check if passwords do not match
       if (password !== confirmPassword) {
-        toast.error("Passwords do not match!");
-        // alert("password do not match");
-        return;
+        return toast.error("Passwords do not match!");
       }
 
-      // 2. Send response with data to backened
+      // 3. Send response with data to backened
       const response = await fetch("http://localhost:8000/register", {
         method: "POST",
         headers: {
@@ -230,7 +231,7 @@ const SignUp = () => {
 
       const result = await response.json();
 
-      // 3. Handle response
+      // 4. Handle response
       if (response.ok) {
         toast.success("Verification email sent. Please check your inbox.");
         navigate("/verify-email", {
@@ -238,7 +239,7 @@ const SignUp = () => {
         });
       } else {
         // console.log("ERROR")
-        toast.error(result.message || "Something went wrong");
+        toast.error(result.error || result.message || "Something went wrong");
       }
     } catch (err) {
       console.log("catch err : ", err);
@@ -266,7 +267,9 @@ const SignUp = () => {
             <FormLayout>
               <FormRow>
                 <FormField>
-                  <label htmlFor="name">Name</label>
+                  <label htmlFor="name">
+                    Name <span style={{ color: "red" }}>*</span>
+                  </label>
                   <input
                     type="text"
                     name="name"
@@ -292,7 +295,9 @@ const SignUp = () => {
 
               <FormRow>
                 <FormField $width="100%">
-                  <label htmlFor="email">Email</label>
+                  <label htmlFor="email">
+                    Email <span style={{ color: "red" }}>*</span>
+                  </label>
                   <input
                     type="email"
                     name="email"
@@ -306,7 +311,10 @@ const SignUp = () => {
 
               <FormRow>
                 <FormField $width="100%">
-                  <label htmlFor="password">Password</label>
+                  <label htmlFor="password">
+                    Password{" "}
+                    <span style={{ color: "red", paddingLeft: "2px" }}>*</span>
+                  </label>
                   <input
                     type="password"
                     name="password"
@@ -315,14 +323,15 @@ const SignUp = () => {
                       setPassword(e.target.value);
                     }}
                     autoComplete="new-password"
-                    required
                   ></input>
                 </FormField>
               </FormRow>
 
               <FormRow>
                 <FormField $width="100%">
-                  <label htmlFor="repeatpass">Repeat Password</label>
+                  <label htmlFor="repeatpass">
+                    Repeat Password <span style={{ color: "red" }}>*</span>
+                  </label>
                   <input
                     type="password"
                     name="repeatpass"
@@ -331,7 +340,6 @@ const SignUp = () => {
                       setConfirmPassword(e.target.value);
                     }}
                     autoComplete="new-password"
-                    required
                   ></input>
                 </FormField>
               </FormRow>
@@ -362,7 +370,7 @@ const SignUp = () => {
           <AuthRedirectText>
             <span>Already have an account?</span>
             <span>
-              <StyledNavlink to="https://www.google.com">Log In</StyledNavlink>
+              <StyledNavlink to="/login">Log In</StyledNavlink>
             </span>
           </AuthRedirectText>
         </div>

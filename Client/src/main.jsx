@@ -2,7 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import { createGlobalStyle } from "styled-components";
-import { createBrowserRouter, RouterProvider } from "react-router";
+import { createBrowserRouter, Navigate, RouterProvider } from "react-router";
 import Home from "./components/Home";
 import Transactions from "./components/Transactions";
 import About from "./components/About";
@@ -14,6 +14,7 @@ import SignUp from "./components/SignUp";
 import ForgotPassword from "./components/ForgotPassword";
 import ResetPassword from "./components/ResetPassword";
 import VerifyEmail from "./components/VerifyEmail";
+import { Toaster } from "react-hot-toast";
 
 // Password Reset Done
 /* <SuccessNotification
@@ -62,20 +63,25 @@ const GlobalStyle = createGlobalStyle`
 `;
 
 const router = createBrowserRouter([
-  { path: "/signup", element: <SignUp /> },
+  // { path: "/", element: <Navigate to="/signup" /> },
   {
     path: "/",
     element: <App />,
     children: [
       { index: true, element: <Home /> },
-      { path: "/transactions", element: <Transactions /> },
-      { path: "/about", element: <About /> },
-      { path: "/support", element: <Support /> },
+      { path: "transactions", element: <Transactions /> },
+      { path: "about", element: <About /> },
+      { path: "support", element: <Support /> },
     ],
   },
+  { path: "/signup", element: <SignUp /> },
   {
     path: "/verify-email",
     element: <VerifyEmail />,
+  },
+  {
+    path: "/login",
+    element: <SignIn />,
   },
 ]);
 
@@ -83,5 +89,6 @@ createRoot(document.getElementById("root")).render(
   <StrictMode>
     <GlobalStyle />
     <RouterProvider router={router} />
+    <Toaster />
   </StrictMode>
 );

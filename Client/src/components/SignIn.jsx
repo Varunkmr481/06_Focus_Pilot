@@ -1,4 +1,6 @@
-import { NavLink } from "react-router";
+import { useState } from "react";
+import toast from "react-hot-toast";
+import { NavLink, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 const AuthWrapper = styled.div`
@@ -150,7 +152,8 @@ const ButtonGroup = styled.div`
   gap: 0.6rem;
 `;
 
-const FormBtn = styled.div`
+const FormBtn = styled.button`
+  border: unset;
   width: 100%;
   /* background-color:rgb(181, 181, 181); */
   background-color: ${({ $color }) => $color && $color};
@@ -184,6 +187,107 @@ const ForgotPasswordLink = styled(NavLink)`
 `;
 
 const SignIn = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isRememberMe, setIsRememberMe] = useState(false);
+  const navigate = useNavigate();
+
+  // async function handleSubmit(e) {
+  //   e.preventDefault();
+
+  //   // 1. Console log
+  //   console.log("LOGIN SUBMIT HANDLER");
+
+  //   try {
+  //     // 1. Check is email or password empty
+  //     if (!email || !password) {
+  //       return toast.error("Please fill in all the required fields.");
+  //     }
+
+  //     // 2. Create data object for sending to the server
+  //     const userData = { email, password };
+  //     console.log(userData);
+
+  //     // 3. Send request to server
+  //     const response = await fetch("http://localhost:8000/login", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify(userData),
+  //     });
+
+  //     const result = await response.json();
+
+  //     // 3. Extracting details of the person who logged in
+  //     const {
+  //       name: loggedInUser,
+  //       email: loggedInEmail,
+  //       token: loggedInToken,
+  //     } = result;
+
+  //     // console.log();
+  //   } catch (err) {
+  //     console.log("catch err : ", err);
+  //     toast.error(err.message || "Something went wrong 💥");
+  //   }
+  // }
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+
+    console.log("SUBMIT HANDLER TRIGGERED");
+
+    try {
+      const data = { email, password };
+      // console.log(data);
+      // console.log(!email);
+
+      // 1. Check if all fields entered
+      // if (!email || !password) {
+      //   console.log("enter email pass");
+      //   return toast.error("Please fill in all the required fields.");
+      // }
+
+      // 2. Send response with data to backened
+      const response = await fetch("http://localhost:8000/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      console.log(response);
+
+      const result = await response.json();
+
+      // 3. Extracting details of the person who logged in
+      const {
+        name: loggedinUserName,
+        email: loggedInEmail,
+        token: loggedinToken,
+      } = result;
+      console.log("result", result);
+
+      // 4. Handle response
+      if (response.ok) {
+        toast.success("Logged in successfully");
+        localStorage.setItem("token", loggedinToken);
+        localStorage.setItem("user", loggedinUserName);
+        setTimeout(() => {
+          navigate("/");
+        }, 1000);
+      } else {
+        // console.log("ERROR")
+        toast.error(result.error || result.message || "Something went wrong");
+      }
+    } catch (err) {
+      console.log("catch err : ", err);
+      toast.error(err.message || "Something went wrong 💥");
+    }
+  }
+
   return (
     <AuthWrapper>
       <AuthCard>
@@ -195,23 +299,40 @@ const SignIn = () => {
         </AuthHeader>
 
         <AuthBody>
-          <Form>
+          <Form onSubmit={handleSubmit}>
             <FormLayout>
               <FormRow>
                 <FormField $width="100%">
-                  <label htmlFor="email">Email</label>
-                  <input type="text" name="email" id="email" />
+                  <label htmlFor="email">
+                    Email <span style={{ color: "red" }}>*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="email"
+                    id="email"
+                    autoComplete="username"
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                    }}
+                    value={email}
+                  />
                 </FormField>
               </FormRow>
 
               <FormRow>
                 <FormField $width="100%">
-                  <label htmlFor="password">Password</label>
+                  <label htmlFor="password">
+                    Password <span style={{ color: "red" }}>*</span>
+                  </label>
                   <input
                     type="password"
                     name="password"
                     id="password"
-                    required
+                    autoComplete="current-password"
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                    }}
+                    value={password}
                   />
                 </FormField>
               </FormRow>
@@ -219,7 +340,15 @@ const SignIn = () => {
 
             <FormOptions>
               <CheckboxWrapper>
-                <input type="checkbox" id="check" name="check" />
+                <input
+                  type="checkbox"
+                  id="check"
+                  name="check"
+                  onChange={() => {
+                    setIsRememberMe((prev) => !prev);
+                  }}
+                  checked={isRememberMe}
+                />
                 <label htmlFor="check">Remember me</label>
               </CheckboxWrapper>
 
@@ -227,7 +356,11 @@ const SignIn = () => {
             </FormOptions>
 
             <ButtonGroup>
-              <FormBtn $color="#5f00d9" $hovercolor="rgb(132, 45, 247)">
+              <FormBtn
+                $color="#5f00d9"
+                $hovercolor="rgb(132, 45, 247)"
+                type="submit"
+              >
                 Log In
               </FormBtn>
               <FormBtn
@@ -245,71 +378,5 @@ const SignIn = () => {
     </AuthWrapper>
   );
 };
-
-// const SignIn = () => {
-//   return (
-//     <WelcomeWrapper>
-//       <div className="welcome-box">
-//         <div className="welcome-header">
-//           <div className="welcome-title">Welcome to Crypto App</div>
-//           <div className="welcome-subtitle">
-//             Enter your credentials to access the account.
-//           </div>
-//         </div>
-
-//         <div className="welcome-content">
-//           <Form>
-//             {/* form */}
-//             <FormLayout>
-//               <FormRow>
-//                 <FormField $width="100%">
-//                   <label htmlFor="email">Email</label>
-//                   <input type="text" name="email" id="email"></input>
-//                 </FormField>
-//               </FormRow>
-
-//               <FormRow>
-//                 <FormField $width="100%">
-//                   <label htmlFor="password">Password</label>
-//                   <input
-//                     type="password"
-//                     name="password"
-//                     id="password"
-//                     required
-//                   ></input>
-//                 </FormField>
-//               </FormRow>
-//             </FormLayout>
-
-//             {/* form end */}
-
-//             <RememberWrapper>
-//               <RememberMe>
-//                 <input type="checkbox" id="check" name="check"></input>
-//                 <label htmlFor="check">Remember me</label>
-//               </RememberMe>
-
-//               <StyledNavlink>Forgot password?</StyledNavlink>
-//             </RememberWrapper>
-
-//             <FormBtnWrapper>
-//               <FormBtn $color="#5f00d9" $hovercolor="rgb(132, 45, 247)">
-//                 Log In
-//               </FormBtn>
-//               <FormBtn
-//                 $textcolor="black"
-//                 $color="rgb(200, 200, 200)"
-//                 $hovertextclr="white"
-//                 $hovercolor="rgb(132, 45, 247)"
-//               >
-//                 Create New Account
-//               </FormBtn>
-//             </FormBtnWrapper>
-//           </Form>
-//         </div>
-//       </div>
-//     </WelcomeWrapper>
-//   );
-// };
 
 export default SignIn;

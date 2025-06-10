@@ -10,7 +10,7 @@ const VerifyEmail = () => {
       icon={<img src="./mail.png" />}
       title="Email Verification"
       subtitle={`We have sent you an email verification to  ${userEmail}. If you didn’t receive it, click the button below.`}
-      btntext="Re-Send Email"
+      btn={false}
     ></SuccessNotification>
   );
 };
