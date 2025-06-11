@@ -15,6 +15,7 @@ import ForgotPassword from "./components/ForgotPassword";
 import ResetPassword from "./components/ResetPassword";
 import VerifyEmail from "./components/VerifyEmail";
 import { Toaster } from "react-hot-toast";
+import ExpiredJwt from "./components/ExpiredJwt";
 
 // Password Reset Done
 /* <SuccessNotification
@@ -83,12 +84,25 @@ const router = createBrowserRouter([
     path: "/login",
     element: <SignIn />,
   },
+  {
+    path: "/expired-jwt",
+    element: (
+      <ExpiredJwt
+        title="Your verification link has expired. Please log in to your account to request a new verification email."
+        btntext="Log in"
+        to="/login"
+      />
+    ),
+  },
+  {
+    path: "http://localhost:5173/profile",
+  },
 ]);
 
 createRoot(document.getElementById("root")).render(
-  <StrictMode>
+  <>
     <GlobalStyle />
     <RouterProvider router={router} />
     <Toaster />
-  </StrictMode>
+  </>
 );

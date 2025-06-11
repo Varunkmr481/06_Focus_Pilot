@@ -9,11 +9,12 @@ import {
   MdSupportAgent,
   MdAccountCircle,
 } from "react-icons/md";
-import { NavLink, Outlet, useNavigate } from "react-router";
+import { Navigate, NavLink, Outlet, useNavigate } from "react-router";
 import styled from "styled-components";
 import UserDropDown from "./components/UserDropDown";
 import { RiLogoutBoxRFill } from "react-icons/ri";
 import toast, { Toaster } from "react-hot-toast";
+import { useEffect } from "react";
 
 const Container = styled.div`
   position: relative;
@@ -215,7 +216,54 @@ const navLinks = [
 const App = () => {
   const [headerText, setHeaderText] = useState("DashBoard");
   const [showSideBar, setShowSideBar] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(null);
   const navigate = useNavigate();
+
+  // React Strict Mode ke wajah se development mode me useEffect do baar run hota hai intentionally.
+  useEffect(() => {
+    console.log("RENDERING APP.JS");
+
+    const verifyToken = async function () {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        toast.error("Please login first!");
+        // ✅ added navigate here also if no token
+        navigate("/login");
+        return;
+      }
+
+      try {
+        const response = await fetch("http://localhost:8000/home", {
+          headers: {
+            authorization: token,
+            "Content-Type": "application/json",
+          },
+        });
+
+        const data = await response.json();
+        console.log("Incoming data :", data);
+
+        if (data.success) {
+          setIsLoggedIn(true);
+        } else {
+          setIsLoggedIn(false);
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          navigate("/login");
+        }
+      } catch (err) {
+        console.error(err);
+        toast.error("Something went wrong!");
+        setIsLoggedIn(false);
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        navigate("/login");
+      }
+    };
+
+    verifyToken();
+  }, [navigate]);
 
   const avatarMenuItems = [
     {
@@ -245,6 +293,16 @@ const App = () => {
       // to: "/transactions",
     },
   ];
+
+  // ✅ Add loading or fallback UI while isLoggedIn is null
+  if (isLoggedIn === null) {
+    return <div>Loading...</div>;
+  }
+
+  // ✅ If still false, redirecting handled inside useEffect. This just prevents rendering
+  if (!isLoggedIn) {
+    return null;
+  }
 
   return (
     <Container $showSideBar={showSideBar}>
@@ -297,8 +355,6 @@ const App = () => {
           <Outlet />
         </Content>
       </ContentContainer>
-
-      <Toaster />
     </Container>
   );
 };

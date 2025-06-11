@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { NavLink, useNavigate } from "react-router-dom";
@@ -192,46 +193,22 @@ const SignIn = () => {
   const [isRememberMe, setIsRememberMe] = useState(false);
   const navigate = useNavigate();
 
-  // async function handleSubmit(e) {
-  //   e.preventDefault();
+  // strict mode m useeffect do baar run hote h
+  useEffect(() => {
+    const verifiedEmailNotification = function () {
+      const query = new URLSearchParams(window.location.search);
+      const status = query.get("status");
+      // console.log("Parameter : ", status);
 
-  //   // 1. Console log
-  //   console.log("LOGIN SUBMIT HANDLER");
+      if (status === "success") {
+        return toast.success("🎉 Your email has been successfully verified!");
+      } else if (status === "already") {
+        return toast.success("✔️ Email already verified. Please login.");
+      }
+    };
 
-  //   try {
-  //     // 1. Check is email or password empty
-  //     if (!email || !password) {
-  //       return toast.error("Please fill in all the required fields.");
-  //     }
-
-  //     // 2. Create data object for sending to the server
-  //     const userData = { email, password };
-  //     console.log(userData);
-
-  //     // 3. Send request to server
-  //     const response = await fetch("http://localhost:8000/login", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify(userData),
-  //     });
-
-  //     const result = await response.json();
-
-  //     // 3. Extracting details of the person who logged in
-  //     const {
-  //       name: loggedInUser,
-  //       email: loggedInEmail,
-  //       token: loggedInToken,
-  //     } = result;
-
-  //     // console.log();
-  //   } catch (err) {
-  //     console.log("catch err : ", err);
-  //     toast.error(err.message || "Something went wrong 💥");
-  //   }
-  // }
+    verifiedEmailNotification();
+  }, []);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -265,6 +242,7 @@ const SignIn = () => {
       // 3. Extracting details of the person who logged in
       const {
         name: loggedinUserName,
+        // eslint-disable-next-line no-unused-vars
         email: loggedInEmail,
         token: loggedinToken,
       } = result;
@@ -363,16 +341,21 @@ const SignIn = () => {
               >
                 Log In
               </FormBtn>
-              <FormBtn
-                $textcolor="black"
-                $color="rgb(200, 200, 200)"
-                $hovertextclr="white"
-                $hovercolor="rgb(132, 45, 247)"
-              >
-                Create New Account
-              </FormBtn>
             </ButtonGroup>
           </Form>
+          <ButtonGroup>
+            <FormBtn
+              $textcolor="black"
+              $color="rgb(200, 200, 200)"
+              $hovertextclr="white"
+              $hovercolor="rgb(132, 45, 247)"
+              onClick={() => {
+                navigate("/signup");
+              }}
+            >
+              Create New Account
+            </FormBtn>
+          </ButtonGroup>
         </AuthBody>
       </AuthCard>
     </AuthWrapper>
