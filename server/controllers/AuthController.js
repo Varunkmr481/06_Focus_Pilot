@@ -99,7 +99,7 @@ const verifyEmail = async (req, res) => {
 
     // 3. Extract user info from token
     const user = await User.findById({ _id: decoded.id });
-    console.log("user", user);
+    console.log("Decoding user", user);
 
     // 4. check if user extracted from token or not
     if (!user) {
@@ -111,16 +111,28 @@ const verifyEmail = async (req, res) => {
 
     // 5. If user is already verified redirect
     if (user.verified) {
-      return res.redirect("http://localhost:5173/email-already-verified");
+      return res.redirect("http://localhost:5173/login?status=already");
+      // return res.redirect(
+      //   "http://localhost:5173/email-already-verified?status=already"
+      // );
     }
 
     // 6. verify user and save to db
     user.verified = true;
     await user.save();
 
-    // 7. redirect to homepage
-    return res.redirect("http://localhost:5173/login");
+    // 7. redirect to homepage after successful verification
+    return res.redirect("http://localhost:5173/login?status=success");
   } catch (err) {
+    if (err.message === "jwt expired") {
+      res.redirect("http://localhost:5173/expired-jwt");
+
+      return res.status(400).json({
+        message: err.message,
+        location: "AuthController/verifyEmail/catch",
+      });
+    }
+
     return res.status(400).json({
       message: err.message,
       location: "AuthController/verifyEmail/catch",
