@@ -21,6 +21,7 @@ const AvatarDropDownMenu = styled.div`
   position: absolute;
   right: 11%;
   top: 100%;
+  z-index: 9999;
 `;
 
 const AvatarDropDownItem = styled(NavLink)`
@@ -50,12 +51,17 @@ const AvatarInfo = styled.div`
 `;
 
 const AvatarName = styled.div`
-  font-size: 1.2rem;
+  font-size: 0.9rem;
+
+  @media (min-width: 780px) {
+    font-size: 1.2rem;
+  }
 `;
 
 const UserDropDown = ({
   avatarMenuItems,
   userAvatar,
+  setHeaderText,
   // loggedInUser = "user",
 }) => {
   const [isAvatarClick, setIsAvatarClick] = useState(false);
@@ -111,7 +117,10 @@ const UserDropDown = ({
               <AvatarDropDownItem
                 key={index}
                 to={menuItem?.to}
-                onClick={menuItem.action}
+                onClick={() => {
+                  menuItem.action();
+                  setHeaderText(menuItem.label);
+                }}
               >
                 <span>{menuItem.icon}</span>
                 <span>{menuItem.label}</span>

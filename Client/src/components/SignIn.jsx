@@ -201,7 +201,9 @@ const SignIn = () => {
       // console.log("Parameter : ", status);
 
       if (status === "success") {
-        return toast.success("🎉 Your email has been successfully verified!");
+        return toast.success(
+          "🎉 Your email has been successfully verified! Please login."
+        );
       } else if (status === "already") {
         return toast.success("✔️ Email already verified. Please login.");
       }
@@ -251,6 +253,7 @@ const SignIn = () => {
       // 4. Handle response
       if (response.ok) {
         toast.success("Logged in successfully");
+        localStorage.setItem("email", loggedInEmail);
         localStorage.setItem("token", loggedinToken);
         localStorage.setItem("user", loggedinUserName);
         setTimeout(() => {
