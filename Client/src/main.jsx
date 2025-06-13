@@ -16,6 +16,7 @@ import ResetPassword from "./components/ResetPassword";
 import VerifyEmail from "./components/VerifyEmail";
 import { Toaster } from "react-hot-toast";
 import ExpiredJwt from "./components/ExpiredJwt";
+import Profile from "./components/Profile";
 
 // Password Reset Done
 /* <SuccessNotification
@@ -73,6 +74,7 @@ const router = createBrowserRouter([
       { path: "transactions", element: <Transactions /> },
       { path: "about", element: <About /> },
       { path: "support", element: <Support /> },
+      { path: "profile", element: <Profile /> },
     ],
   },
   { path: "/signup", element: <SignUp /> },

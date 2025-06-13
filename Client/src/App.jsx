@@ -129,7 +129,7 @@ const Navbar = styled.div`
   justify-content: space-between;
   align-items: center;
   height: 15vh;
-  width: 100vw;
+  /* width: 100vw; */
   /* background-color: cornflowerblue; */
   background-color: #5f00d9;
   color: white;
@@ -348,6 +348,7 @@ const App = () => {
           <UserDropDown
             avatarMenuItems={avatarMenuItems}
             userAvatar={<MdAccountCircle />}
+            setHeaderText={setHeaderText}
           />
         </Navbar>
 
