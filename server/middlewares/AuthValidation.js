@@ -45,6 +45,26 @@ const loginValidation = (req, res, next) => {
   next();
 };
 
+const resetPasswordValidation = (req, res, next) => {
+  console.log("**RUNNING RESETPASS VALIDATION**");
+
+  const userSchema = joi.object({
+    currentPassword: joi.string().min(4).max(100).required(),
+    newPassword: joi.string().min(4).max(100).required(),
+  });
+
+  const { error } = userSchema.validate(req.body);
+
+  if (error) {
+    return res.status(400).json({
+      message: "Bad request",
+      error: error.details[0].message,
+    });
+  }
+
+  next();
+};
+
 const PasswordMatchValidation = (req, res, next) => {
   console.log("**RUNNING PASSWORDCHECK VALIDATION**");
 
@@ -90,6 +110,7 @@ const EmailNotVerifiedValidation = async (req, res, next) => {
 module.exports = {
   signupValidation,
   loginValidation,
+  resetPasswordValidation,
   PasswordMatchValidation,
   EmailNotVerifiedValidation,
 };

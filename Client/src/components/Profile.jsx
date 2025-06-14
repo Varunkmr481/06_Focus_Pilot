@@ -48,30 +48,35 @@ const Avatar = styled.div`
 
 const ProfileInfoContainer = styled.div`
   width: 70vw;
-  margin-top: 1rem;
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  /* border: 1px solid black; */
 `;
 
 const LabelValueWrapper = styled.div`
   display: flex;
   align-items: flex-end;
   gap: 0.7rem;
-  margin-bottom: 1.5rem;
+  /* margin-bottom: 1rem; */
 `;
 
 const Label = styled.div`
   font-weight: 600;
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   color: #333;
 `;
 
 const Value = styled.div`
   color: #555;
-  font-size: 1.3rem;
+  font-size: 1.2rem;
 `;
 
 const ButtonWrapper = styled.div`
   display: flex;
-  align-items: center;
+  /* justify-content: center; */
+  flex-direction: column;
   gap: 1rem;
 `;
 
@@ -83,6 +88,7 @@ const ResetBtn = styled.button`
   border-radius: 0.6rem;
   font-size: 1.1rem;
   cursor: pointer;
+  width: 11.5rem;
 
   &:hover {
     background-color: rgb(111, 17, 233);
@@ -91,6 +97,7 @@ const ResetBtn = styled.button`
 
 const VerifyEmailBtn = styled.button`
   border: unset;
+  width: 11.5rem;
   background-color: #5f00d9;
   color: white;
   padding: 1rem 1.5rem;
@@ -103,10 +110,52 @@ const VerifyEmailBtn = styled.button`
   }
 `;
 
+const ResetPassForm = styled.form`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1.2rem;
+
+  label {
+    font-size: 1.2rem;
+    font-weight: 500;
+  }
+`;
+
+const FormField = styled.div`
+  display: flex;
+  gap: 1rem;
+  /* flex-direction: column; */
+  /* width: 50%; */
+
+  label {
+    font-size: 1.2rem;
+    font-weight: 500;
+  }
+
+  input {
+    height: 2rem;
+  }
+
+  input,
+  textarea {
+    box-sizing: border-box;
+    border-radius: 0.5rem;
+    padding: 0.3rem 0.7rem;
+    background-color: transparent;
+    border: 2px solid rgba(152, 152, 152, 0.3);
+    width: 30%;
+  }
+`;
+
 const Profile = () => {
   const [loggedUser, setLoggedUser] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [isEmailSent, setIsEmailSent] = useState(null);
+  const [userTypedPass, setUserTypedPass] = useState({
+    currentPassword: "",
+    newPassword: "",
+  });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -204,7 +253,39 @@ const Profile = () => {
     }
   };
 
-  // console.log(loggedUser);
+  async function resetPasswordHandler(e) {
+    e.preventDefault();
+
+    try {
+      // 1. Extract token from the localstorage
+      const token = localStorage.getItem("token");
+
+      // 2. Send token, usertyped current & new password to /reset-password
+      const res = await fetch("http://localhost:8000/reset-password", {
+        method: "POST",
+        headers: {
+          authorization: token,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userTypedPass),
+      });
+
+      // 3. Receive data from server
+      const data = await res.json();
+
+      // 4. Perform response handling
+      if (data.success) {
+        setUserTypedPass({ currentPassword: "", newPassword: "" });
+        toast.success("Password reset successfully 🎉");
+        return;
+      } else {
+        toast.error(data.error || data.message || "Error! Try again later");
+        return;
+      }
+    } catch (err) {
+      toast.error(err.message);
+    }
+  }
 
   return (
     <GridContentAbout>
@@ -236,13 +317,40 @@ const Profile = () => {
         </LabelValueWrapper>
 
         <ButtonWrapper>
-          <ResetBtn>Reset Password</ResetBtn>
           {!loggedUser.verified && !isEmailSent && (
             <VerifyEmailBtn onClick={handleVerifyEmail} disabled={isLoading}>
               {isLoading ? "Loading" : "Verify Email"}
             </VerifyEmailBtn>
           )}
         </ButtonWrapper>
+
+        <ResetPassForm onSubmit={resetPasswordHandler}>
+          <FormField>
+            <label>Current Password :</label>
+            <input
+              type="text"
+              value={userTypedPass.currentPassword}
+              onChange={(e) =>
+                setUserTypedPass((prev) => {
+                  return { ...prev, currentPassword: e.target.value };
+                })
+              }
+            />
+          </FormField>
+          <FormField>
+            <label>New Password :</label>
+            <input
+              type="text"
+              value={userTypedPass.newPassword}
+              onChange={(e) =>
+                setUserTypedPass((prev) => {
+                  return { ...prev, newPassword: e.target.value };
+                })
+              }
+            />
+          </FormField>
+          <ResetBtn type="submit">Reset Password</ResetBtn>
+        </ResetPassForm>
       </ProfileInfoContainer>
     </GridContentAbout>
   );
