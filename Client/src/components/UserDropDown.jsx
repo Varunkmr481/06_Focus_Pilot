@@ -10,9 +10,18 @@ const AvatarImage = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  font-size: 1.4rem;
 
   &:hover {
     cursor: pointer;
+  }
+
+  @media (min-width: 596px) {
+    font-size: 1.6rem;
+  }
+
+  @media (min-width: 780px) {
+    font-size: 2rem;
   }
 `;
 
@@ -52,9 +61,18 @@ const AvatarInfo = styled.div`
 
 const AvatarName = styled.div`
   font-size: 0.9rem;
+  display: none;
+
+  @media (min-width: 425px) {
+    display: block;
+  }
+
+  @media (min-width: 596px) {
+    font-size: 1rem;
+  }
 
   @media (min-width: 780px) {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
   }
 `;
 
@@ -98,7 +116,6 @@ const UserDropDown = ({
     <AvatarWrapper>
       <AvatarInfo>
         <AvatarName>Hello, {loggedInUser}</AvatarName>
-        {/* {userAvatar} */}
         <AvatarImage
           ref={avatarRef}
           onClick={() => {

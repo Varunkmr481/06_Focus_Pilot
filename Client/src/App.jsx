@@ -327,7 +327,7 @@ const App = () => {
         </SidebarMenu>
 
         <Credit>
-          Credit : design by
+          Credit : design by{" "}
           <NavLink
             to="https://www.youtube.com/@dosomecoding"
             className="credit_link"
