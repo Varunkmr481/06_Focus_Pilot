@@ -1,5 +1,5 @@
 import { useLocation } from "react-router";
-import SuccessNotification from "./SuccessNotification";
+import SuccessNotification from "../components/SuccessNotification";
 
 const VerifyEmail = () => {
   const location = useLocation();

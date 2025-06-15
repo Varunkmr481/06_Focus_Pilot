@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import InfoSection from "./InfoSection";
+import InfoSection from "../components/InfoSection";
 
 const GridContentAbout = styled.div`
   display: flex;

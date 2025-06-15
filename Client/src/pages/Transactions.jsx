@@ -1,9 +1,9 @@
 import { FaCaretDown, FaDownload, FaSearch } from "react-icons/fa";
 import styled from "styled-components";
-import Status from "./Status";
+import Status from "../components/Status";
 import { useEffect, useRef, useState } from "react";
 import fakeTransactions from "../data/fakeData";
-import TransactionViewRestriction from "./TransactionViewRestriction";
+import TransactionViewRestriction from "../components/TransactionViewRestriction";
 
 const GridContentTransaction = styled.div`
   display: flex;

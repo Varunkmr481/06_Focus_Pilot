@@ -3,12 +3,12 @@ import { FaArrowTrendUp } from "react-icons/fa6";
 import { LuArrowDownToLine, LuArrowUpToLine } from "react-icons/lu";
 import { FaPlusCircle, FaMinusCircle } from "react-icons/fa";
 import styled from "styled-components";
-import CurrencyTag from "./CurrencyTag";
-import IconButton from "./IconButton";
-import TransactionCard from "./TransactionCard";
+import CurrencyTag from "../components/CurrencyTag";
+import IconButton from "../components/IconButton";
+import TransactionCard from "../components/TransactionCard";
 import { useState } from "react";
 import { NavLink } from "react-router";
-import StickerOverlayCard from "./StickerOverlayCard";
+import StickerOverlayCard from "../components/StickerOverlayCard";
 
 const filterOptions = [
   { label: "1H", value: "1h" },

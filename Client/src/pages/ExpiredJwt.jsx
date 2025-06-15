@@ -1,5 +1,5 @@
 import { MdGeneratingTokens } from "react-icons/md";
-import SuccessNotification from "./SuccessNotification";
+import SuccessNotification from "../components/SuccessNotification";
 
 const ExpiredJwt = ({ title, btntext, to }) => {
   return (

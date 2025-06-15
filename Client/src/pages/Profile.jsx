@@ -1,6 +1,6 @@
 import { MdAccountCircle } from "react-icons/md";
 import styled from "styled-components";
-import Status from "./Status";
+import Status from "../components/Status";
 import { useEffect } from "react";
 import { useState } from "react";
 import toast from "react-hot-toast";
