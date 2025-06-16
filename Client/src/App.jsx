@@ -12,7 +12,7 @@ import {
 import { Navigate, NavLink, Outlet, useNavigate } from "react-router";
 import styled from "styled-components";
 import UserDropDown from "./components/UserDropDown";
-import { RiLogoutBoxRFill } from "react-icons/ri";
+import { RiFocus2Fill, RiLogoutBoxRFill } from "react-icons/ri";
 import toast, { Toaster } from "react-hot-toast";
 import { useEffect } from "react";
 
@@ -197,6 +197,13 @@ const navLinks = [
     icon: <GrTransaction />,
     label: "Transaction",
     headerText: "Recent Transactions",
+  },
+  {
+    to: "/Focusmode",
+    icon: <RiFocus2Fill />,
+    label: "Focus Mode",
+    headerText: "Focus Mode",
+    className: "focus",
   },
   {
     to: "/about",

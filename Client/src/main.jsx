@@ -3,20 +3,21 @@ import { createRoot } from "react-dom/client";
 import App from "./App";
 import { createGlobalStyle } from "styled-components";
 import { createBrowserRouter, Navigate, RouterProvider } from "react-router";
-import Home from "./components/Home";
-import Transactions from "./components/Transactions";
-import About from "./components/About";
-import Support from "./components/Support";
+import Home from "./pages/Home";
+import Transactions from "./pages/Transactions";
+import About from "./pages/About";
+import Support from "./pages/Support";
 // import Welcome from "./components/Welcome";
 import SuccessNotification from "./components/SuccessNotification";
-import SignIn from "./components/SignIn";
-import SignUp from "./components/SignUp";
+import SignIn from "./pages/SignIn";
+import SignUp from "./pages/SignUp";
 import ForgotPassword from "./components/ForgotPassword";
 import ResetPassword from "./components/ResetPassword";
-import VerifyEmail from "./components/VerifyEmail";
+import VerifyEmail from "./pages/VerifyEmail";
 import { Toaster } from "react-hot-toast";
-import ExpiredJwt from "./components/ExpiredJwt";
-import Profile from "./components/Profile";
+import ExpiredJwt from "./pages/ExpiredJwt";
+import Profile from "./pages/Profile";
+import FocusMode from "./pages/FocusMode";
 
 // Password Reset Done
 /* <SuccessNotification
@@ -76,6 +77,7 @@ const router = createBrowserRouter([
       { path: "support", element: <Support /> },
       { path: "profile", element: <Profile /> },
       { path: "settings", element: <div>coming soon...</div> },
+      { path: "focusmode", element: <FocusMode /> },
     ],
   },
   { path: "/signup", element: <SignUp /> },
@@ -104,8 +106,10 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")).render(
   <>
-    <GlobalStyle />
-    <RouterProvider router={router} />
-    <Toaster />
+    <StrictMode>
+      <GlobalStyle />
+      <RouterProvider router={router} />
+      <Toaster />
+    </StrictMode>
   </>
 );
