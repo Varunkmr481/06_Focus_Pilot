@@ -1,4 +1,6 @@
+import { useEffect, useRef } from "react";
 import { useState } from "react";
+import toast from "react-hot-toast";
 import { IoMdWarning } from "react-icons/io";
 import { IoCloseCircle } from "react-icons/io5";
 import styled, { keyframes } from "styled-components";
@@ -19,11 +21,19 @@ const pulse = keyframes`
 `;
 
 const FocusContainer = styled.div`
-  filter: ${({ $isDialogEnable }) => {
-    return $isDialogEnable ? "blur(3px)" : "blur(0px)";
+  filter: ${({ $isStartDialogEnable, $isDistraction, $isEndSession }) => {
+    return $isStartDialogEnable || $isDistraction || $isEndSession
+      ? "blur(3px)"
+      : "blur(0px)";
   }};
-  pointer-events: ${({ $isDialogEnable }) => {
-    return $isDialogEnable ? "none" : "all";
+  pointer-events: ${({
+    $isStartDialogEnable,
+    $isDistraction,
+    $isEndSession,
+  }) => {
+    return $isStartDialogEnable || $isDistraction || $isEndSession
+      ? "none"
+      : "all";
   }};
   position: relative;
 `;
@@ -108,8 +118,14 @@ const ClockCircle = styled.circle`
 const ClockText = styled.text`
   font-size: 2.25rem;
   font-weight: bold;
-  fill: black;
+  fill: ${({ $timeLeft }) => {
+    if ($timeLeft === null || $timeLeft === 0) return "black"; // not started
+    if ($timeLeft <= 120) return "red"; // warning
+
+    return "black"; // default
+  }};
   text-anchor: middle;
+  /* fill: black; */
 `;
 
 const ClockTask = styled.text`
@@ -338,16 +354,11 @@ const FormSelect = styled.select`
 
 /* DISTRACTION FORM */
 
-const DistractFormContainer = styled.div`
+const NewFormContainer = styled.div`
   background-color: rgb(160, 137, 253);
-  transform: ${({ $isDistraction }) => {
-    console.log("styled : ", $isDistraction);
-
-    return $isDistraction ? "translate(-50%, -40%)" : "translate(-50%, -300%)";
+  transform: ${({ $isVisible }) => {
+    return $isVisible ? "translate(-50%, -40%)" : "translate(-50%, -300%)";
   }};
-  /* transform: translate(-45%, -35%); */
-
-  /* opacity: ${({ $isDistraction }) => ($isDistraction ? "1" : "0")}; */
   position: absolute;
   top: 50%;
   left: 50%;
@@ -358,7 +369,7 @@ const DistractFormContainer = styled.div`
   transition: all 0.3s ease-in;
 `;
 
-const DistractionForm = styled.form`
+const NewForm = styled.form`
   display: grid;
   grid-template-columns: 1fr;
   grid-gap: 1rem;
@@ -367,14 +378,15 @@ const DistractionForm = styled.form`
   width: 100%;
 `;
 
-const DistractionFormField = styled.div`
+const NewFormField = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: 0.4rem;
   /* background-color: aquamarine; */
 `;
-const DistractionReasonArea = styled.textarea`
+
+const NewReasonArea = styled.textarea`
   box-sizing: border-box;
   width: 100%;
   border-radius: 0.5rem;
@@ -382,56 +394,307 @@ const DistractionReasonArea = styled.textarea`
   font-size: 1.2rem;
 `;
 
+// ******* END SESSION FORM ************
+
+const EndSessionFormContainer = styled.div`
+  background-color: rgb(160, 137, 253);
+  transform: ${({ $isVisible }) => {
+    return $isVisible ? "translate(-50%, -40%)" : "translate(-50%, -300%)";
+  }};
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 40%;
+  z-index: 9999;
+  padding: 0.8rem;
+  border-radius: 1rem;
+  transition: all 0.3s ease-in;
+`;
+
+const EndSessionForm = styled.form`
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-gap: 1rem;
+  padding: 1rem;
+  border-radius: 1rem;
+  width: 100%;
+`;
+
+const SessionFormField = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.4rem;
+  /* background-color: aquamarine; */
+  grid-column: 1/3;
+`;
+
+const EndSessionSummaryArea = styled.textarea`
+  box-sizing: border-box;
+  width: 100%;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.8rem;
+  font-size: 1.2rem;
+`;
+
+const initialSessionInfo = {
+  taskTitle: "",
+  sessionDuration: 5,
+  breakDuration: "10",
+  sessionGoal: "Deep work",
+  distractionInput: "", // for input field
+  distractions: [],
+  summary: "",
+  earlyEndReason: "Got Distracted",
+};
+
 const FocusMode = () => {
+  const [currSID, setCurrSID] = useState("");
+  const distractionsRef = useRef([]);
   const [isDialogEnable, setIsDialogEnable] = useState(false);
   const [isDistraction, setIsDistraction] = useState(false);
-  const [distractionInfo, setDistractionInfo] = useState({ distraction: "" });
-  const [taskTitle, setTaskTitle] = useState("");
-  const [sessionDuration, setSessionDuration] = useState(180);
-  const [breakDuration, setBreakDuration] = useState("10m");
-  const [sessionGoal, setSessionGoal] = useState("Deep work");
+  const [isEndSession, setIsEndSession] = useState(false);
+  const [sessionInfo, setSessionInfo] = useState(initialSessionInfo);
+  const [isRunning, setIsRunning] = useState(false);
+  const [progress, setProgress] = useState(0); // circle
+  const [timeLeft, setTimeLeft] = useState(null); // in sec
+  const [timerInterval, setTimerInterval] = useState(null); // for clearing interval
+
+  useEffect(() => {
+    if (timeLeft !== null && sessionInfo.sessionDuration) {
+      const totalSeconds = sessionInfo.sessionDuration * 60;
+      const progress = ((totalSeconds - timeLeft) / totalSeconds) * 100;
+      setProgress(progress);
+    }
+  }, [sessionInfo.sessionDuration, timeLeft]);
+
   const radius = 130; // Bigger radius
   const circumference = 2 * Math.PI * radius;
-  const dashoffset = 130;
+  const dashoffset = circumference - (progress / 100) * circumference;
 
   const handleStartSession = function () {
     setIsDialogEnable(true);
+  };
+
+  const handleSessionStartForm = async function (e) {
+    e.preventDefault();
+
+    try {
+      // 1. Adding new fields for database match
+      const token = localStorage.getItem("token");
+      const currentTime = Date.now(); // in ms
+      const durationInMinutes = parseInt(sessionInfo.sessionDuration, 10);
+      const endTime = currentTime + durationInMinutes * 60 * 1000;
+
+      // 2. Create session info object
+      const sessionObj = {
+        taskTitle: sessionInfo.taskTitle,
+        sessionDuration: durationInMinutes,
+        breakDuration: sessionInfo.breakDuration,
+        sessionGoal: sessionInfo.sessionGoal,
+        startTime: currentTime,
+        endTime,
+        summary: sessionInfo.summary,
+        distractions: sessionInfo.distractions,
+        earlyEndReason: sessionInfo.earlyEndReason,
+      };
+
+      console.log("Sending Session", sessionObj);
+
+      // 3. Send to server url
+      const res = await fetch("http://localhost:8000/session/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: token,
+        },
+        body: JSON.stringify(sessionObj),
+      });
+
+      // 3. Handling response
+      const data = await res.json();
+
+      if (data.success) {
+        toast.success("Session saved succesfully");
+        // console.log(data.data);
+
+        // Start countdown
+        const durationSeconds = durationInMinutes * 60;
+        setTimeLeft(durationSeconds);
+        setIsRunning(true);
+        setCurrSID(data.sessionId);
+        const sessionId = data.sessionId;
+
+        const interval = setInterval(() => {
+          setTimeLeft((prev) => {
+            if (prev < 1) {
+              clearInterval(interval);
+              setIsRunning(false);
+              // setSessionInfo(initialSessionInfo);
+
+              const handleDistraction = async () => {
+                try {
+                  // 1. Send to backend immediately (optional but recommended)
+                  const token = localStorage.getItem("token");
+
+                  // console.log("Form distractions : ", currSID);
+                  const disObj = {
+                    distractions: distractionsRef.current,
+                  };
+
+                  // 2. Send to backened
+                  await fetch(
+                    `http://localhost:8000/session/update/${sessionId}`,
+                    {
+                      method: "PATCH",
+                      headers: {
+                        "Content-Type": "application/json",
+                        authorization: token,
+                      },
+                      body: JSON.stringify(disObj),
+                    }
+                  );
+                } catch (err) {
+                  toast.err(err.message);
+                }
+              };
+
+              handleDistraction();
+              setSessionInfo(initialSessionInfo);
+
+              return 0;
+            }
+
+            return prev - 1;
+          });
+        }, 1000);
+
+        setTimerInterval(interval); // for future cleanup
+      } else {
+        toast.error(data.message || data.error || "Something");
+      }
+      console.log("Session saved : ", data);
+
+      setIsDialogEnable(false);
+    } catch (err) {
+      toast.error(err.message);
+    }
   };
 
   const handleCloseSessionForm = function () {
     setIsDialogEnable(false);
   };
 
-  const handleSessionForm = function (e) {
-    e.preventDefault();
-
-    const sessionObj = {
-      taskTitle,
-      sessionDuration,
-      breakDuration,
-      sessionGoal,
-    };
-
-    console.log(sessionObj);
-
-    setIsDialogEnable(false);
+  const handleEndSession = () => {
+    setIsEndSession(true);
   };
 
-  const handleDistractionForm = function (e) {
+  const handleSessionEnd = async (e) => {
     e.preventDefault();
 
-    const distractionObj = distractionInfo;
+    try {
+      if (!isRunning) {
+        return toast.error(
+          "Please start the session before performing this action."
+        );
+      }
 
-    console.log(distractionObj);
+      const token = localStorage.getItem("token");
+      const endObj = {
+        summary: sessionInfo.summary,
+        earlyEndReason: sessionInfo.earlyEndReason,
+        endTime: Date.now(),
+        distractions: distractionsRef.current,
+      };
+      console.log(endObj);
+
+      // 2. Send request with id to end session
+      const res = await fetch(
+        `http://localhost:8000/session/update/${currSID}`,
+        {
+          method: "PATCH",
+          headers: {
+            authorization: token,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(endObj),
+        }
+      );
+
+      // 3. Handle response
+      const data = await res.json();
+
+      console.log(data);
+
+      if (data.success) {
+        clearInterval(timerInterval);
+        setTimeLeft(0);
+        setIsRunning(false);
+        setIsEndSession(false);
+        setSessionInfo(initialSessionInfo);
+
+        toast.success("Session ended successfully!");
+      } else {
+        toast.error(data.message || data.error || "Error ending session!");
+      }
+    } catch (err) {
+      toast.error(err.message);
+    }
+  };
+
+  const formatTime = (seconds) => {
+    // ensures that a string is at least targetLength characters long by adding padString at the beginning of the string if needed
+    const mins = String(Math.floor(seconds / 60)).padStart(2, "0");
+    const secs = String(seconds % 60).padStart(2, "0");
+
+    return `${mins}:${secs}`;
+  };
+
+  const handleDistractionForm = async function (e) {
+    e.preventDefault();
+
+    try {
+      // 1. Create a distraction object
+      const distractionObj = {
+        time: Date.now(),
+        reason: sessionInfo.distractionInput,
+      };
+
+      console.log("Distraction Obj : ", distractionObj);
+
+      // 2. Push in distraction array
+      setSessionInfo((prev) => {
+        const updated = {
+          ...prev,
+          distractions: [distractionObj, ...prev.distractions],
+          distractionInput: "",
+        };
+
+        distractionsRef.current = updated.distractions;
+
+        return updated;
+      });
+
+      setIsDistraction(false);
+
+      // 3. Distraction track updated
+      toast.success("Distraction noted successfully!");
+    } catch (err) {
+      return toast.error(err.message);
+    }
   };
 
   return (
     <>
-      <FocusContainer $isDialogEnable={isDialogEnable}>
+      <FocusContainer
+        $isStartDialogEnable={isDialogEnable}
+        $isDistraction={isDistraction}
+        $isEndSession={isEndSession}
+      >
         <FocusHeader>
           <FocusStatBlock>
             <FocusStatLabel>Session status : </FocusStatLabel>
-            <FocusStatValue>On</FocusStatValue>
+            <FocusStatValue>{isRunning ? "On" : "Off"}</FocusStatValue>
           </FocusStatBlock>
 
           <FocusStatBlock>
@@ -461,12 +724,12 @@ const FocusMode = () => {
                 strokeDashoffset={dashoffset} // dynamic
                 style={{ transition: "stroke-dashoffset 1s linear" }}
               />
-              <ClockText x={155} y={160}>
-                21:00
+              <ClockText x={155} y={160} $timeLeft={timeLeft}>
+                {timeLeft !== null ? formatTime(timeLeft) : "00:00"}
               </ClockText>
               <ClockTask x={155} y={190}>
                 {/* 📚 Studying React Hooks */}
-                {`🥇 ${taskTitle}`}
+                {`🥇 ${sessionInfo.taskTitle}`}
               </ClockTask>
             </ClockSvg>
             <ClockQuote>💡 "Stay focused, you’re doing great!"</ClockQuote>
@@ -480,8 +743,13 @@ const FocusMode = () => {
             >
               Start Session
             </FocusBtn>
-            <FocusBtn>Pause Session</FocusBtn>
-            <FocusBtn>End Session</FocusBtn>
+            <FocusBtn
+              onClick={() => {
+                handleEndSession();
+              }}
+            >
+              End Session
+            </FocusBtn>
             <FocusBtn>Calm music</FocusBtn>
             <FocusDistractBtn onClick={() => setIsDistraction(true)}>
               <span>
@@ -504,15 +772,18 @@ const FocusMode = () => {
           </FormCloseBtn>
         </FormCloseContainer>
 
-        <StartSessionForm onSubmit={handleSessionForm}>
+        <StartSessionForm onSubmit={handleSessionStartForm}>
           <FormField>
             <FormLabel htmlFor="task">Task Title</FormLabel>
             <FormInput
               type="text"
               id="task"
-              value={taskTitle}
+              value={sessionInfo.taskTitle}
               onChange={(e) => {
-                setTaskTitle(e.target.value);
+                // setTaskTitle(e.target.value);
+                setSessionInfo((prev) => {
+                  return { ...prev, taskTitle: e.target.value };
+                });
               }}
             />
           </FormField>
@@ -522,9 +793,12 @@ const FocusMode = () => {
             <FormInput
               type="text"
               id="duration"
-              value={sessionDuration}
+              value={sessionInfo.sessionDuration}
               onChange={(e) => {
-                setSessionDuration(e.target.value);
+                // setSessionDuration(e.target.value);
+                setSessionInfo((prev) => {
+                  return { ...prev, sessionDuration: e.target.value };
+                });
               }}
             />
           </FormField>
@@ -533,13 +807,16 @@ const FocusMode = () => {
             <FormLabel htmlFor="break">Break Duration</FormLabel>
             <FormSelect
               id="break"
-              value={breakDuration}
+              value={sessionInfo.breakDuration}
               onChange={(e) => {
-                setBreakDuration(e.target.value);
+                // setBreakDuration(e.target.value);
+                setSessionInfo((prev) => {
+                  return { ...prev, breakDuration: e.target.value };
+                });
               }}
             >
-              <option value="5m">5 min</option>
-              <option value="10m">10 min</option>
+              <option value="5">5 min</option>
+              <option value="10">10 min</option>
             </FormSelect>
           </FormField>
 
@@ -547,9 +824,12 @@ const FocusMode = () => {
             <FormLabel htmlFor="goal">Goal for Session</FormLabel>
             <FormSelect
               id="goal"
-              value={sessionGoal}
+              value={sessionInfo.sessionGoal}
               onChange={(e) => {
-                setSessionGoal(e.target.value);
+                // setSessionGoal(e.target.value);
+                setSessionInfo((prev) => {
+                  return { ...prev, sessionGoal: e.target.value };
+                });
               }}
             >
               <option value="Deep work">Deep work</option>
@@ -570,7 +850,7 @@ const FocusMode = () => {
       </FormContainer>
 
       {/* DISTRACTION FORM */}
-      <DistractFormContainer $isDistraction={isDistraction}>
+      <NewFormContainer $isVisible={isDistraction}>
         <FormCloseContainer>
           <FormCloseBtn
             onClick={() => {
@@ -581,25 +861,102 @@ const FocusMode = () => {
           </FormCloseBtn>
         </FormCloseContainer>
 
-        <DistractionForm onSubmit={handleDistractionForm}>
-          <DistractionFormField>
+        <NewForm onSubmit={handleDistractionForm}>
+          <NewFormField>
             <FormLabel htmlFor="distraction">
               What Disrupted Your Focus? Describe the Distraction in detail
               here.
             </FormLabel>
-            <DistractionReasonArea
+            <NewReasonArea
               id="distraction"
               rows={6}
-              value={distractionInfo.distraction}
+              value={sessionInfo.distractionInput}
               onChange={(e) => {
-                setDistractionInfo({ distraction: e.target.value });
+                // setDistractionInfo({ distraction: e.target.value });
+                setSessionInfo((prev) => {
+                  return { ...prev, distractionInput: e.target.value };
+                });
               }}
             />
-          </DistractionFormField>
+          </NewFormField>
 
           <SessionFormBtn type="Submit">Done</SessionFormBtn>
-        </DistractionForm>
-      </DistractFormContainer>
+        </NewForm>
+      </NewFormContainer>
+
+      {/* SESSION END */}
+      <EndSessionFormContainer $isVisible={isEndSession}>
+        <FormCloseContainer>
+          <FormCloseBtn
+            onClick={() => {
+              setIsEndSession(false);
+            }}
+          >
+            <CloseIcon />
+          </FormCloseBtn>
+        </FormCloseContainer>
+
+        <EndSessionForm onSubmit={handleSessionEnd}>
+          <SessionFormField>
+            <FormLabel htmlFor="summary">Describe in detail : </FormLabel>
+            <EndSessionSummaryArea
+              id="summary"
+              rows={4}
+              value={sessionInfo.summary}
+              onChange={(e) => {
+                // setDistractionInfo({ distraction: e.target.value });
+                setSessionInfo((prev) => {
+                  return { ...prev, summary: e.target.value };
+                });
+              }}
+            />
+          </SessionFormField>
+
+          <SessionFormField>
+            <FormLabel>Reason for Ending Early :</FormLabel>
+            <FormSelect
+              value={sessionInfo.earlyEndReason}
+              onChange={(e) => {
+                setSessionInfo((prev) => {
+                  return { ...prev, earlyEndReason: e.target.value };
+                });
+              }}
+            >
+              <optgroup label="Valid Work Reasons">
+                <option value="Completed Task Early">
+                  ✅ Completed Task Early
+                </option>
+                <option value="Urgent Personal Work">
+                  🚨 Urgent Personal Work
+                </option>
+              </optgroup>
+
+              <optgroup label="Focus Issues">
+                <option value="Lost Focus">
+                  🌀 Lost Focus / Couldn't concentrate
+                </option>
+                <option value="Got Distracted">
+                  📱 Got Distracted (Phone, Social Media, etc.)
+                </option>
+                <option value="Unexpected Call/Message">
+                  📞 Unexpected Call or Message
+                </option>
+              </optgroup>
+
+              <optgroup label="Health or Energy">
+                <option value="Low Energy">😴 Low Energy / Sleepy</option>
+                <option value="Health Issue">
+                  🤕 Felt Unwell / Health Issue
+                </option>
+              </optgroup>
+
+              <option value="Other">❓ Other</option>
+            </FormSelect>
+          </SessionFormField>
+
+          <SessionFormBtn type="Submit">Done</SessionFormBtn>
+        </EndSessionForm>
+      </EndSessionFormContainer>
     </>
   );
 };
