@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import { IoMdWarning } from "react-icons/io";
 import { IoCloseCircle } from "react-icons/io5";
 import styled, { keyframes } from "styled-components";
+import { Badge } from "../components/Milestones";
 
 const pulse = keyframes`
   0% {
@@ -64,7 +65,7 @@ const FocusStatBlock = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.3rem;
+  gap: 0.5rem;
   font-size: 0.9rem;
 
   @media (min-width: 425px) {
@@ -163,7 +164,7 @@ const FocusBtnWrapper = styled.div`
   grid-gap: 1rem;
 
   @media (min-width: 768px) {
-    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1.5fr;
   }
 
   @media (min-width: 1024px) {
@@ -191,6 +192,31 @@ const FocusBtn = styled.button`
   }
 `;
 
+const FocusMusicBtn = styled.button`
+  border: unset;
+  box-sizing: border-box;
+  padding: 1rem;
+  border-radius: 0.6rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  background-color: #5f00d9;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.3rem;
+  grid-column: 1/3;
+
+  &:hover {
+    background-color: rgb(129, 45, 240);
+    cursor: pointer;
+  }
+
+  @media (min-width: 768px) {
+    grid-column: 3/4;
+  }
+`;
+
 const FocusDistractBtn = styled.button`
   border: unset;
   box-sizing: border-box;
@@ -212,13 +238,13 @@ const FocusDistractBtn = styled.button`
   }
 
   @media (min-width: 768px) {
-    grid-column: 1/5;
+    grid-column: 4/5;
   }
 
   @media (min-width: 1024px) {
-    grid-column: 5/6;
-    font-size: 0.7rem;
-    gap: 0.2rem;
+    grid-column: 4/6;
+    font-size: 0.9rem;
+    gap: 0.3rem;
     font-weight: 700;
   }
 `;
@@ -450,7 +476,7 @@ const initialSessionInfo = {
 
 const FocusMode = () => {
   const [currSID, setCurrSID] = useState("");
-  const distractionsRef = useRef([]);
+  const [posi, setPosi] = useState({ currentLevel: "", currentBadge: "" });
   const [isDialogEnable, setIsDialogEnable] = useState(false);
   const [isDistraction, setIsDistraction] = useState(false);
   const [isEndSession, setIsEndSession] = useState(false);
@@ -459,6 +485,7 @@ const FocusMode = () => {
   const [progress, setProgress] = useState(0); // circle
   const [timeLeft, setTimeLeft] = useState(null); // in sec
   const [timerInterval, setTimerInterval] = useState(null); // for clearing interval
+  const distractionsRef = useRef([]);
 
   useEffect(() => {
     if (timeLeft !== null && sessionInfo.sessionDuration) {
@@ -473,6 +500,10 @@ const FocusMode = () => {
   const dashoffset = circumference - (progress / 100) * circumference;
 
   const handleStartSession = function () {
+    if (isRunning) {
+      return toast.error("Please stop current session to start new");
+    }
+
     setIsDialogEnable(true);
   };
 
@@ -484,16 +515,29 @@ const FocusMode = () => {
       const token = localStorage.getItem("token");
       const currentTime = Date.now(); // in ms
       const durationInMinutes = parseInt(sessionInfo.sessionDuration, 10);
-      const endTime = currentTime + durationInMinutes * 60 * 1000;
+      // const endTime = currentTime + durationInMinutes * 60 * 1000;
+
+      // 2. Check if token exists or title is valid
+      if (!token) {
+        throw new Error("No token found. Please log in.");
+      }
+
+      if (isNaN(durationInMinutes) || durationInMinutes <= 0) {
+        throw new Error("Invalid session duration");
+      }
+
+      if (!sessionInfo.taskTitle) {
+        throw new Error("Task title is required");
+      }
 
       // 2. Create session info object
       const sessionObj = {
         taskTitle: sessionInfo.taskTitle,
-        sessionDuration: durationInMinutes,
+        // sessionDuration: durationInMinutes,
         breakDuration: sessionInfo.breakDuration,
         sessionGoal: sessionInfo.sessionGoal,
         startTime: currentTime,
-        endTime,
+        endTime: 0,
         summary: sessionInfo.summary,
         distractions: sessionInfo.distractions,
         earlyEndReason: sessionInfo.earlyEndReason,
@@ -515,7 +559,7 @@ const FocusMode = () => {
       const data = await res.json();
 
       if (data.success) {
-        toast.success("Session saved succesfully");
+        toast.success("Session saved successfully");
         // console.log(data.data);
 
         // Start countdown
@@ -540,10 +584,11 @@ const FocusMode = () => {
                   // console.log("Form distractions : ", currSID);
                   const disObj = {
                     distractions: distractionsRef.current,
+                    endTime: Date.now(),
                   };
 
                   // 2. Send to backened
-                  await fetch(
+                  const res = await fetch(
                     `http://localhost:8000/session/update/${sessionId}`,
                     {
                       method: "PATCH",
@@ -554,13 +599,19 @@ const FocusMode = () => {
                       body: JSON.stringify(disObj),
                     }
                   );
+
+                  const data = await res.json();
+
+                  console.log("Updated data : ", data.updatedSession);
+                  toast.success("🎉 Session completed successfully!");
                 } catch (err) {
-                  toast.err(err.message);
+                  toast.error(err.message);
                 }
               };
 
               handleDistraction();
               setSessionInfo(initialSessionInfo);
+              // distractionsRef.current = [];
 
               return 0;
             }
@@ -586,6 +637,12 @@ const FocusMode = () => {
   };
 
   const handleEndSession = () => {
+    if (!isRunning) {
+      return toast.error(
+        "Please start the session before performing this action."
+      );
+    }
+
     setIsEndSession(true);
   };
 
@@ -624,14 +681,15 @@ const FocusMode = () => {
       // 3. Handle response
       const data = await res.json();
 
-      console.log(data);
-
       if (data.success) {
         clearInterval(timerInterval);
         setTimeLeft(0);
         setIsRunning(false);
         setIsEndSession(false);
         setSessionInfo(initialSessionInfo);
+        distractionsRef.current = [];
+
+        console.log("End session :", data);
 
         toast.success("Session ended successfully!");
       } else {
@@ -654,6 +712,12 @@ const FocusMode = () => {
     e.preventDefault();
 
     try {
+      if (!isRunning) {
+        return toast.error(
+          "Please start the session before performing this action."
+        );
+      }
+
       // 1. Create a distraction object
       const distractionObj = {
         time: Date.now(),
@@ -704,12 +768,14 @@ const FocusMode = () => {
 
           <FocusStatBlock>
             <FocusStatLabel>Current level : </FocusStatLabel>
-            <FocusStatValue>2</FocusStatValue>
+            <FocusStatValue>1</FocusStatValue>
           </FocusStatBlock>
 
           <FocusStatBlock>
             <FocusStatLabel>XP badge: </FocusStatLabel>
-            <FocusStatValue>📛</FocusStatValue>
+            <FocusStatValue>
+              <Badge className="badge-1">🎖️ Novice</Badge>
+            </FocusStatValue>
           </FocusStatBlock>
         </FocusHeader>
 
@@ -741,7 +807,7 @@ const FocusMode = () => {
                 handleStartSession();
               }}
             >
-              Start Session
+              {isRunning ? "In Progress.." : "Start Session"}
             </FocusBtn>
             <FocusBtn
               onClick={() => {
@@ -750,8 +816,19 @@ const FocusMode = () => {
             >
               End Session
             </FocusBtn>
-            <FocusBtn>Calm music</FocusBtn>
-            <FocusDistractBtn onClick={() => setIsDistraction(true)}>
+            <FocusMusicBtn>Calm music</FocusMusicBtn>
+
+            <FocusDistractBtn
+              onClick={() => {
+                if (!isRunning) {
+                  return toast.error(
+                    "Please start the session before performing this action."
+                  );
+                }
+
+                setIsDistraction(true);
+              }}
+            >
               <span>
                 <IoMdWarning />
               </span>
