@@ -6,6 +6,29 @@ const sendEmail = require("../sendEmail");
 const { resetPasswordValidation } = require("../middlewares/AuthValidation");
 const cryptoRouter = require("express").Router();
 
+cryptoRouter.get("/getUser", ensureAuthenticated, async (req, res) => {
+  // 1. Extract user if from req.user
+  const userId = req.user.id;
+
+  // 2. now extract all the info of the user
+  const user = await User.findById(userId);
+
+  if (!user) {
+    return res.status(204).json({
+      success: false,
+      error: "No user found",
+      message: "No user found",
+      location: "cryptoRouter/getUser/try",
+    });
+  }
+
+  // 3. Now send response
+  return res.status(200).json({
+    success: true,
+    user,
+  });
+});
+
 cryptoRouter.get("/home", ensureAuthenticated, async (req, res) => {
   const user = await User.find({ email: req.user.email });
   console.log(user[0]);

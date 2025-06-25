@@ -7,6 +7,12 @@ const sessionSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    taskTitle: {
+      type: String,
+    },
+    sessionGoal: {
+      type: String,
+    },
     startTime: {
       type: Number,
       required: true,
@@ -16,6 +22,9 @@ const sessionSchema = new mongoose.Schema(
       required: true,
     },
     summary: {
+      type: String,
+    },
+    earlyEndReason: {
       type: String,
     },
     distractions: [
@@ -30,6 +39,6 @@ const sessionSchema = new mongoose.Schema(
   }
 );
 
-const sessionModel = mongoose.model("Session", sessionSchema);
+const Session = mongoose.model("Session", sessionSchema);
 
-module.exports = sessionModel;
+module.exports = Session;

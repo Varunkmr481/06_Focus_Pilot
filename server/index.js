@@ -9,6 +9,7 @@ const jwt = require("jsonwebtoken");
 const router = require("./routes/AuthRouter");
 const Authrouter = require("./routes/AuthRouter");
 const cryptoRouter = require("./routes/CryptoRouter");
+const sessionRouter = require("./routes/SessionRouter");
 const app = express();
 const port = 8000;
 
@@ -54,6 +55,7 @@ app.delete("/all", async (req, res) => {
 
 app.use("/", Authrouter);
 app.use("/", cryptoRouter);
+app.use("/", sessionRouter);
 
 app.listen(process.env.PORT, () => {
   console.log("Server running on port ", port);
