@@ -10,6 +10,9 @@ const sessionSchema = new mongoose.Schema(
     taskTitle: {
       type: String,
     },
+    status: {
+      type: String,
+    },
     sessionGoal: {
       type: String,
     },

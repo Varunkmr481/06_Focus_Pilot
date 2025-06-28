@@ -6,8 +6,6 @@ const userSchema = mongoose.Schema(
     email: { type: String, unique: true },
     password: String,
     verified: { type: Boolean, default: false },
-    xp: { type: Number, default: 0 },
-    streak: { type: Number, default: 0 },
     totalHours: {
       type: Number,
       default: 0, // Total hours accumulated from sessions
@@ -22,7 +20,6 @@ const userSchema = mongoose.Schema(
     currentTrophy: {
       type: String,
     },
-    totalTimeTracked: { type: Number, default: 0 }, // in seconds
   },
   { timestamps: true }
 );
