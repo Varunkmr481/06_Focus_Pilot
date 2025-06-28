@@ -111,6 +111,8 @@ const ClockSvg = styled.svg`
 const ClockCircle = styled.circle`
   fill: transparent;
   stroke: #5f00d9;
+  stroke: ${({ $currentPhase }) =>
+    $currentPhase === "focus" ? "#5f00d9" : "rgb(0, 221, 30)"};
   stroke-width: 14;
   stroke-linecap: round;
   transition: stroke-dashoffset 1s linear;
@@ -466,7 +468,7 @@ const EndSessionSummaryArea = styled.textarea`
 const initialSessionInfo = {
   taskTitle: "",
   sessionDuration: 5,
-  breakDuration: "10",
+  breakDuration: "1",
   sessionGoal: "Deep work",
   distractionInput: "", // for input field
   distractions: [],
@@ -476,53 +478,219 @@ const initialSessionInfo = {
 
 const FocusMode = () => {
   const [currSID, setCurrSID] = useState("");
-  const [posi, setPosi] = useState({ currentLevel: "", currentBadge: "" });
+  const [posi, setPosi] = useState({
+    currentLevel: "",
+    currentBadge: "",
+    currentTrophy: "",
+    totalSession: 0,
+  });
+  const [totalSessions, setTotalSessions] = useState(null);
+  const [isMusicEnabled, setIsMusicEnabled] = useState(false);
   const [isDialogEnable, setIsDialogEnable] = useState(false);
   const [isDistraction, setIsDistraction] = useState(false);
   const [isEndSession, setIsEndSession] = useState(false);
   const [sessionInfo, setSessionInfo] = useState(initialSessionInfo);
-  const [isRunning, setIsRunning] = useState(false);
   const [progress, setProgress] = useState(0); // circle
-  const [timeLeft, setTimeLeft] = useState(null); // in sec
-  const [timerInterval, setTimerInterval] = useState(null); // for clearing interval
+
+  // Timer Logic
+  const [totalTime, setTotalTime] = useState(50);
+  const [focusLength, setFocusLength] = useState(2); // One focus session
+  const [breakLength, setBreakLength] = useState(1); // Break after focus
+  const [currentPhase, setCurrentPhase] = useState("Focus");
+  const [timeLeft, setTimeLeft] = useState(0); // in sec
+  const [isRunning, setIsRunning] = useState(false);
+  const [sessionIndex, setSessionIndex] = useState(0);
+  const [sessions, setSessions] = useState([]);
   const distractionsRef = useRef([]);
+  const focusAudioRef = useRef(null);
+  const breakAudioRef = useRef(null);
 
   useEffect(() => {
-    if (timeLeft !== null && sessionInfo.sessionDuration) {
-      const totalSeconds = sessionInfo.sessionDuration * 60;
-      const progress = ((totalSeconds - timeLeft) / totalSeconds) * 100;
-      setProgress(progress);
+    countSessions();
+  }, []);
+
+  useEffect(() => {
+    focusAudioRef.current = new Audio("/sounds/focus.wav");
+    breakAudioRef.current = new Audio("/sounds/break.wav");
+
+    focusAudioRef.current.loop = true;
+    breakAudioRef.current.loop = true;
+
+    return () => {
+      focusAudioRef.current.pause();
+      breakAudioRef.current.pause();
+    };
+  }, []);
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        // 1. Extract token from localstorage
+        const token = localStorage.getItem("token");
+
+        // 2. send api call to http://localhost:8000/getUser
+        const res = await fetch("http://localhost:8000/getUser", {
+          headers: {
+            authorization: token,
+            "Content-Type": "application/json",
+          },
+        });
+
+        const data = await res.json();
+
+        const { currentBadge, currentLevel, currentTrophy } = data.user;
+
+        // console.log("current User : ", data);
+
+        if (currentBadge || currentTrophy || currentLevel) {
+          setPosi({ currentBadge, currentTrophy, currentLevel });
+        } else {
+          setPosi({
+            currentBadge: "",
+            currentTrophy: "",
+            currentLevel: 0,
+          });
+        }
+      } catch (err) {
+        toast.error(err.message);
+      }
+    };
+
+    if (!posi.currentBadge || !posi.currentLevel || !posi.currentTrophy) {
+      fetchUserInfo();
     }
-  }, [sessionInfo.sessionDuration, timeLeft]);
+
+    return;
+  }, []);
+
+  useEffect(() => {
+    if (isRunning && sessions.length > 0) {
+      const currentSession = sessions[sessionIndex];
+      const phaseTotal = currentSession?.duration;
+      const phasePassed = phaseTotal - timeLeft;
+
+      const currentProgress = (phasePassed / phaseTotal) * 100;
+      setProgress(currentProgress);
+    }
+  }, [isRunning, timeLeft, sessionIndex, sessions]);
+
+  useEffect(() => {
+    // generate sessions array when inputs change
+    const fullCycles = Math.floor(totalTime / focusLength);
+    const tempSessions = [];
+
+    for (let i = 0; i < fullCycles; i++) {
+      tempSessions.push({ type: "focus", duration: focusLength * 60 });
+      if (i < fullCycles - 1) {
+        tempSessions.push({ type: "break", duration: breakLength * 60 });
+      }
+    }
+
+    setSessions(tempSessions);
+    console.log("Generated Sessions:", tempSessions); // Debug
+  }, [breakLength, focusLength, totalTime]);
+
+  useEffect(() => {
+    let timer;
+
+    if (isRunning && timeLeft > 0) {
+      timer = setInterval(() => {
+        setTimeLeft((prev) => prev - 1);
+      }, 1000);
+    }
+
+    if (timeLeft === 0 && isRunning) {
+      setSessionIndex((i) => i + 1);
+    }
+
+    return () => clearInterval(timer);
+  }, [isRunning, timeLeft]);
+
+  useEffect(() => {
+    if (sessionIndex < sessions.length) {
+      const current = sessions[sessionIndex];
+      setCurrentPhase(current.type);
+      setTimeLeft(current.duration);
+
+      // Debug
+      console.log("➡️ Current Phase:", sessions[sessionIndex]?.type);
+      console.log("⏳ Time Set:", sessions[sessionIndex]?.duration);
+    } else {
+      // All sessions done
+      setIsRunning(false);
+      setCurrentPhase("Done");
+      setTimeLeft(0);
+    }
+  }, [sessionIndex, sessions]);
+
+  useEffect(() => {
+    if (sessionIndex < sessions.length) {
+      const current = sessions[sessionIndex];
+
+      // Stop all music first
+      focusAudioRef.current?.pause();
+      focusAudioRef.current.currentTime = 0;
+      breakAudioRef.current?.pause();
+      breakAudioRef.current.currentTime = 0;
+
+      // 🧠 Add this guard:
+      if (isMusicEnabled) {
+        if (current.type === "focus") {
+          focusAudioRef.current?.play();
+        } else if (current.type === "break") {
+          breakAudioRef.current?.play();
+        }
+      } else {
+        // Always stop music regardless of toggle
+        focusAudioRef.current.pause();
+        focusAudioRef.current.currentTime = 0;
+        breakAudioRef.current.pause();
+        breakAudioRef.current.currentTime = 0;
+      }
+    }
+  }, [isMusicEnabled, sessionIndex, sessions]);
+
+  useEffect(() => {
+    if (
+      !isRunning &&
+      currentPhase === "Done" &&
+      sessionIndex >= sessions.length &&
+      timeLeft === 0 &&
+      sessions.length > 0
+    ) {
+      SendDistractionToServer();
+      resetAfterNaturalEnd();
+    }
+  }, [isRunning, currentPhase, sessionIndex, sessions, timeLeft]);
 
   const radius = 130; // Bigger radius
   const circumference = 2 * Math.PI * radius;
   const dashoffset = circumference - (progress / 100) * circumference;
 
-  const handleStartSession = function () {
-    if (isRunning) {
-      return toast.error("Please stop current session to start new");
-    }
+  const handleSessionStartForm = (e) => {
+    e.preventDefault();
 
-    setIsDialogEnable(true);
+    if (sessions.length > 0) {
+      setIsDialogEnable(false);
+      setIsRunning(true);
+      SendSessionInfoToServer();
+    }
   };
 
-  const handleSessionStartForm = async function (e) {
-    e.preventDefault();
+  const SendSessionInfoToServer = async function () {
+    // e.preventDefault();
 
     try {
       // 1. Adding new fields for database match
       const token = localStorage.getItem("token");
       const currentTime = Date.now(); // in ms
-      const durationInMinutes = parseInt(sessionInfo.sessionDuration, 10);
-      // const endTime = currentTime + durationInMinutes * 60 * 1000;
 
       // 2. Check if token exists or title is valid
       if (!token) {
         throw new Error("No token found. Please log in.");
       }
 
-      if (isNaN(durationInMinutes) || durationInMinutes <= 0) {
+      if (isNaN(totalTime) || isNaN(breakLength) || breakLength <= 0) {
         throw new Error("Invalid session duration");
       }
 
@@ -533,10 +701,11 @@ const FocusMode = () => {
       // 2. Create session info object
       const sessionObj = {
         taskTitle: sessionInfo.taskTitle,
-        // sessionDuration: durationInMinutes,
-        breakDuration: sessionInfo.breakDuration,
+        sessionDuration: totalTime * 60,
+        breakDuration: breakLength,
         sessionGoal: sessionInfo.sessionGoal,
         startTime: currentTime,
+        status: "invalid session",
         endTime: 0,
         summary: sessionInfo.summary,
         distractions: sessionInfo.distractions,
@@ -560,152 +729,14 @@ const FocusMode = () => {
 
       if (data.success) {
         toast.success("Session saved successfully");
-        // console.log(data.data);
-
-        // Start countdown
-        const durationSeconds = durationInMinutes * 60;
-        setTimeLeft(durationSeconds);
-        setIsRunning(true);
         setCurrSID(data.sessionId);
-        const sessionId = data.sessionId;
-
-        const interval = setInterval(() => {
-          setTimeLeft((prev) => {
-            if (prev < 1) {
-              clearInterval(interval);
-              setIsRunning(false);
-              // setSessionInfo(initialSessionInfo);
-
-              const handleDistraction = async () => {
-                try {
-                  // 1. Send to backend immediately (optional but recommended)
-                  const token = localStorage.getItem("token");
-
-                  // console.log("Form distractions : ", currSID);
-                  const disObj = {
-                    distractions: distractionsRef.current,
-                    endTime: Date.now(),
-                  };
-
-                  // 2. Send to backened
-                  const res = await fetch(
-                    `http://localhost:8000/session/update/${sessionId}`,
-                    {
-                      method: "PATCH",
-                      headers: {
-                        "Content-Type": "application/json",
-                        authorization: token,
-                      },
-                      body: JSON.stringify(disObj),
-                    }
-                  );
-
-                  const data = await res.json();
-
-                  console.log("Updated data : ", data.updatedSession);
-                  toast.success("🎉 Session completed successfully!");
-                } catch (err) {
-                  toast.error(err.message);
-                }
-              };
-
-              handleDistraction();
-              setSessionInfo(initialSessionInfo);
-              // distractionsRef.current = [];
-
-              return 0;
-            }
-
-            return prev - 1;
-          });
-        }, 1000);
-
-        setTimerInterval(interval); // for future cleanup
       } else {
-        toast.error(data.message || data.error || "Something");
+        toast.error(data.message || data.error || "Something went wrong!");
       }
       console.log("Session saved : ", data);
-
-      setIsDialogEnable(false);
     } catch (err) {
       toast.error(err.message);
     }
-  };
-
-  const handleCloseSessionForm = function () {
-    setIsDialogEnable(false);
-  };
-
-  const handleEndSession = () => {
-    if (!isRunning) {
-      return toast.error(
-        "Please start the session before performing this action."
-      );
-    }
-
-    setIsEndSession(true);
-  };
-
-  const handleSessionEnd = async (e) => {
-    e.preventDefault();
-
-    try {
-      if (!isRunning) {
-        return toast.error(
-          "Please start the session before performing this action."
-        );
-      }
-
-      const token = localStorage.getItem("token");
-      const endObj = {
-        summary: sessionInfo.summary,
-        earlyEndReason: sessionInfo.earlyEndReason,
-        endTime: Date.now(),
-        distractions: distractionsRef.current,
-      };
-      console.log(endObj);
-
-      // 2. Send request with id to end session
-      const res = await fetch(
-        `http://localhost:8000/session/update/${currSID}`,
-        {
-          method: "PATCH",
-          headers: {
-            authorization: token,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(endObj),
-        }
-      );
-
-      // 3. Handle response
-      const data = await res.json();
-
-      if (data.success) {
-        clearInterval(timerInterval);
-        setTimeLeft(0);
-        setIsRunning(false);
-        setIsEndSession(false);
-        setSessionInfo(initialSessionInfo);
-        distractionsRef.current = [];
-
-        console.log("End session :", data);
-
-        toast.success("Session ended successfully!");
-      } else {
-        toast.error(data.message || data.error || "Error ending session!");
-      }
-    } catch (err) {
-      toast.error(err.message);
-    }
-  };
-
-  const formatTime = (seconds) => {
-    // ensures that a string is at least targetLength characters long by adding padString at the beginning of the string if needed
-    const mins = String(Math.floor(seconds / 60)).padStart(2, "0");
-    const secs = String(seconds % 60).padStart(2, "0");
-
-    return `${mins}:${secs}`;
   };
 
   const handleDistractionForm = async function (e) {
@@ -748,6 +779,152 @@ const FocusMode = () => {
     }
   };
 
+  const SendDistractionToServer = async () => {
+    try {
+      // 1. Send to backend immediately (optional but recommended)
+      const token = localStorage.getItem("token");
+
+      // console.log("Form distractions : ", currSID);
+      const disObj = {
+        distractions: distractionsRef.current,
+        endTime: Date.now(),
+        status: "completed",
+      };
+
+      // 2. Send to backened
+      const res = await fetch(
+        `http://localhost:8000/session/update/${currSID}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            authorization: token,
+          },
+          body: JSON.stringify(disObj),
+        }
+      );
+
+      const data = await res.json();
+
+      console.log("Updated data : ", data);
+      setPosi({
+        currentBadge: data.currentUser.currentBadge,
+        currentLevel: data.currentUser.currentLevel,
+        currentTrophy: data.currentUser.currentTrophy,
+      });
+      toast.success("🎉 Session completed successfully!");
+    } catch (err) {
+      toast.error(err.message);
+    }
+  };
+
+  const handleSessionEnd = async (e) => {
+    e.preventDefault();
+
+    try {
+      if (!isRunning) {
+        return toast.error(
+          "Please start the session before performing this action."
+        );
+      }
+
+      const token = localStorage.getItem("token");
+      const endObj = {
+        summary: sessionInfo.summary,
+        earlyEndReason: sessionInfo.earlyEndReason,
+        endTime: Date.now(),
+        distractions: distractionsRef.current,
+        status: "early end",
+      };
+      console.log(endObj);
+
+      // 2. Send request with id to end session
+      const res = await fetch(
+        `http://localhost:8000/session/update/${currSID}`,
+        {
+          method: "PATCH",
+          headers: {
+            authorization: token,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(endObj),
+        }
+      );
+
+      // 3. Handle response
+      const data = await res.json();
+
+      if (data.success) {
+        // clearInterval(timerInterval);
+        resetAfterNaturalEnd();
+
+        console.log("End session :", data);
+
+        toast.success("Session ended successfully!");
+      } else {
+        toast.error(data.message || data.error || "Error ending session!");
+      }
+    } catch (err) {
+      toast.error(err.message);
+    }
+  };
+
+  const formatTime = (seconds) => {
+    // ensures that a string is at least targetLength characters long by adding padString at the beginning of the string if needed
+    const mins = String(Math.floor(seconds / 60)).padStart(2, "0");
+    const secs = String(seconds % 60).padStart(2, "0");
+
+    return `${mins}:${secs}`;
+  };
+
+  const countSessions = async () => {
+    try {
+      // 1. Extract token
+      const token = localStorage.getItem("token");
+
+      // 2. Send get req
+      const res = await fetch("http://localhost:8000/session/count", {
+        method: "GET",
+        headers: {
+          authorization: token,
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        setTotalSessions(data.totalSessions);
+      } else {
+        toast.error(data.message || data.error || "Something went wrong!");
+      }
+    } catch (err) {
+      toast.error(err.message);
+    }
+  };
+
+  const resetAfterNaturalEnd = () => {
+    setIsRunning(false);
+    // setCurrentPhase("Focus"); // Reset to initial phase
+    setSessionIndex(0);
+    setSessions([]);
+    setTimeLeft(0);
+    setProgress(0);
+    setTotalTime(0);
+    setCurrSID(""); // Optional: clear session id
+    distractionsRef.current = [];
+    setSessionInfo(initialSessionInfo);
+    setIsDialogEnable(false);
+    setIsDistraction(false);
+    setIsEndSession(false);
+    focusAudioRef.current.pause();
+    focusAudioRef.current.currentTime = 0;
+    breakAudioRef.current.pause();
+    breakAudioRef.current.currentTime = 0;
+    setIsMusicEnabled(false);
+    countSessions();
+  };
+
   return (
     <>
       <FocusContainer
@@ -762,19 +939,21 @@ const FocusMode = () => {
           </FocusStatBlock>
 
           <FocusStatBlock>
-            <FocusStatLabel>Streak : </FocusStatLabel>
-            <FocusStatValue>2</FocusStatValue>
+            <FocusStatLabel>Sessions Done : </FocusStatLabel>
+            <FocusStatValue>{totalSessions}</FocusStatValue>
           </FocusStatBlock>
 
           <FocusStatBlock>
             <FocusStatLabel>Current level : </FocusStatLabel>
-            <FocusStatValue>1</FocusStatValue>
+            <FocusStatValue>{posi.currentLevel}</FocusStatValue>
           </FocusStatBlock>
 
           <FocusStatBlock>
             <FocusStatLabel>XP badge: </FocusStatLabel>
             <FocusStatValue>
-              <Badge className="badge-1">🎖️ Novice</Badge>
+              <Badge
+                className={posi.currentBadge ? posi.currentBadge : "default"}
+              >{`${posi.currentTrophy} ${posi.currentBadge}`}</Badge>
             </FocusStatValue>
           </FocusStatBlock>
         </FocusHeader>
@@ -783,40 +962,71 @@ const FocusMode = () => {
           <FocusClock>
             <ClockSvg viewBox="0 0 300 300" preserveAspectRatio="xMidYMid meet">
               <ClockCircle
+                $currentPhase={currentPhase}
                 r={radius}
                 cx="150"
                 cy="150"
                 strokeDasharray={circumference} // 2πr
-                strokeDashoffset={dashoffset} // dynamic
+                strokeDashoffset={dashoffset ? dashoffset : 0} // dynamic
                 style={{ transition: "stroke-dashoffset 1s linear" }}
               />
               <ClockText x={155} y={160} $timeLeft={timeLeft}>
-                {timeLeft !== null ? formatTime(timeLeft) : "00:00"}
+                {formatTime(timeLeft)}
               </ClockText>
               <ClockTask x={155} y={190}>
-                {/* 📚 Studying React Hooks */}
-                {`🥇 ${sessionInfo.taskTitle}`}
+                {sessionInfo.taskTitle}
+              </ClockTask>
+              <ClockTask x={155} y={210}>
+                {isRunning
+                  ? `Phase : ${currentPhase} (${sessionIndex + 1}/${
+                      sessions.length
+                    })`
+                  : "Start new Session"}
               </ClockTask>
             </ClockSvg>
-            <ClockQuote>💡 "Stay focused, you’re doing great!"</ClockQuote>
+            {isRunning && (
+              <ClockQuote>💡 "Stay focused, you’re doing great!"</ClockQuote>
+            )}
           </FocusClock>
 
           <FocusBtnWrapper>
             <FocusBtn
               onClick={() => {
-                handleStartSession();
+                if (isRunning) {
+                  return toast.error(
+                    "Please stop current session to start new"
+                  );
+                }
+
+                setIsDialogEnable(true);
               }}
             >
               {isRunning ? "In Progress.." : "Start Session"}
             </FocusBtn>
             <FocusBtn
               onClick={() => {
-                handleEndSession();
+                if (!isRunning) {
+                  return toast.error(
+                    "Please start the session before performing this action."
+                  );
+                }
+
+                setIsEndSession(true);
               }}
             >
               End Session
             </FocusBtn>
-            <FocusMusicBtn>Calm music</FocusMusicBtn>
+            <FocusMusicBtn
+              onClick={() => {
+                if (!isRunning) {
+                  return toast.error("Please start the session to start music");
+                }
+
+                setIsMusicEnabled((prev) => !prev);
+              }}
+            >
+              {!isMusicEnabled ? "Start Music" : "Pause Music"}
+            </FocusMusicBtn>
 
             <FocusDistractBtn
               onClick={() => {
@@ -842,7 +1052,7 @@ const FocusMode = () => {
         <FormCloseContainer>
           <FormCloseBtn
             onClick={() => {
-              handleCloseSessionForm();
+              setIsDialogEnable(false);
             }}
           >
             <CloseIcon />
@@ -867,31 +1077,33 @@ const FocusMode = () => {
 
           <FormField>
             <FormLabel htmlFor="duration">Session Duration</FormLabel>
-            <FormInput
+            <FormSelect
               type="text"
               id="duration"
-              value={sessionInfo.sessionDuration}
+              value={totalTime}
               onChange={(e) => {
-                // setSessionDuration(e.target.value);
-                setSessionInfo((prev) => {
-                  return { ...prev, sessionDuration: e.target.value };
-                });
+                setTotalTime(e.target.value);
               }}
-            />
+            >
+              <option value={2}>2 min</option>
+              <option value={50}>50 min</option>
+              <option value={100}>100 min</option>
+              <option value={150}>150 min</option>
+              <option value={200}>200 min</option>
+              <option value={250}>250 min</option>
+            </FormSelect>
           </FormField>
 
           <FormField>
             <FormLabel htmlFor="break">Break Duration</FormLabel>
             <FormSelect
               id="break"
-              value={sessionInfo.breakDuration}
+              value={breakLength}
               onChange={(e) => {
-                // setBreakDuration(e.target.value);
-                setSessionInfo((prev) => {
-                  return { ...prev, breakDuration: e.target.value };
-                });
+                setBreakLength(e.target.value);
               }}
             >
+              <option value="1">1 min</option>
               <option value="5">5 min</option>
               <option value="10">10 min</option>
             </FormSelect>
@@ -909,9 +1121,17 @@ const FocusMode = () => {
                 });
               }}
             >
-              <option value="Deep work">Deep work</option>
-              <option value="Light task">Light task</option>
-              <option value="Revision">Revision</option>
+              <optgroup label="Focused Work">
+                <option value="Deep work">Deep work</option>
+                <option value="Light task">Light task</option>
+                <option value="Creative task">Creative task</option>
+              </optgroup>
+
+              <optgroup label="Focused Learning">
+                <option value="Revision">Revision</option>
+                <option value="Concept Learning">Concept Learning</option>
+                <option value="Mock Test">Mock Test</option>
+              </optgroup>
             </FormSelect>
           </FormField>
 
