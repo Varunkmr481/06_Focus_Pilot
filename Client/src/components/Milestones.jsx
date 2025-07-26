@@ -46,56 +46,72 @@ export const Badge = styled.span`
   padding: 5px 10px;
   font-size: 0.6rem;
   border-radius: 5px;
-  color: white;
+  color: black;
   /* font-size: 14px; */
 
   &.Beginner {
     background-color: rgb(220, 136, 57);
+    color: white;
   }
   &.Novice {
     background-color: #4caf50;
+    color: white;
   }
   &.Apprentice {
     background-color: #2196f3;
+    color: white;
   }
   &.Journeyman {
     background-color: #ff9800;
+    color: white;
   }
   &.Expert {
     background-color: #e91e63;
+    color: white;
   }
   &.Master {
     background-color: rgb(168, 27, 215);
+    color: white;
   }
   &.Champion {
     background-color: #009688;
+    color: white;
   }
   &.Hero {
     background-color: #ff5722;
+    color: white;
   }
   &.Legend {
     background-color: #795548;
+    color: white;
   }
   &.Mythic {
     background-color: #607d8b;
+    color: white;
   }
   &.Guardian {
     background-color: #3f51b5;
+    color: white;
   }
   &.Pioneer {
     background-color: #00bcd4;
+    color: white;
   }
   &.Vanguard {
     background-color: rgb(255, 7, 7);
+    color: white;
   }
   &.Trailblazer {
     background-color: #8bc34a;
+    color: white;
   }
   &.Overlord {
     background-color: #f44336;
+    color: white;
   }
   &.Immortal {
     background-color: #673ab7;
+    color: white;
   }
 
   @media (min-width: 768px) {
@@ -125,7 +141,7 @@ const Milestones = () => {
             <td>0</td>
             <td>Beginner</td>
             <td>
-              <Badge className="Beginner">🎖️ Novice</Badge>
+              <Badge className="Beginner">🎖️ Beginner</Badge>
             </td>
             <td>0</td>
           </tr>
@@ -135,7 +151,7 @@ const Milestones = () => {
             <td>
               <Badge className="Novice">🎖️ Novice</Badge>
             </td>
-            <td>100</td>
+            <td>50</td>
           </tr>
           <tr>
             <td>2</td>
@@ -151,7 +167,7 @@ const Milestones = () => {
             <td>
               <Badge className="Journeyman">🏅 Journeyman</Badge>
             </td>
-            <td>475</td>
+            <td>500</td>
           </tr>
           <tr>
             <td>4</td>
@@ -159,7 +175,7 @@ const Milestones = () => {
             <td>
               <Badge className="Expert">🔥 Expert</Badge>
             </td>
-            <td>775</td>
+            <td>800</td>
           </tr>
           <tr>
             <td>5</td>
@@ -167,7 +183,7 @@ const Milestones = () => {
             <td>
               <Badge className="Master">👑 Master</Badge>
             </td>
-            <td>1175</td>
+            <td>750</td>
           </tr>
           <tr>
             <td>6</td>
@@ -175,7 +191,7 @@ const Milestones = () => {
             <td>
               <Badge className="Champion">🏆 Champion</Badge>
             </td>
-            <td>1675</td>
+            <td>1000</td>
           </tr>
           <tr>
             <td>7</td>
@@ -183,7 +199,7 @@ const Milestones = () => {
             <td>
               <Badge className="Hero">⚔️ Hero</Badge>
             </td>
-            <td>2275</td>
+            <td>1200</td>
           </tr>
           <tr>
             <td>8</td>
@@ -191,7 +207,7 @@ const Milestones = () => {
             <td>
               <Badge className="Legend">🌌 Legend</Badge>
             </td>
-            <td>2975</td>
+            <td>1700</td>
           </tr>
           <tr>
             <td>9</td>
@@ -199,7 +215,7 @@ const Milestones = () => {
             <td>
               <Badge className="Mythic">✨ Mythic</Badge>
             </td>
-            <td>3875</td>
+            <td>2400</td>
           </tr>
           <tr>
             <td>10</td>
@@ -207,7 +223,7 @@ const Milestones = () => {
             <td>
               <Badge className="Guardian">🛡️ Guardian</Badge>
             </td>
-            <td>4975</td>
+            <td>3200</td>
           </tr>
           <tr>
             <td>11</td>
@@ -215,7 +231,7 @@ const Milestones = () => {
             <td>
               <Badge className="Pioneer">🚀 Pioneer</Badge>
             </td>
-            <td>6275</td>
+            <td>3900</td>
           </tr>
           <tr>
             <td>12</td>
@@ -223,7 +239,7 @@ const Milestones = () => {
             <td>
               <Badge className="Vanguard">⚡ Vanguard</Badge>
             </td>
-            <td>7775</td>
+            <td>4500</td>
           </tr>
           <tr>
             <td>13</td>
@@ -231,7 +247,7 @@ const Milestones = () => {
             <td>
               <Badge className="Trailblazer">🌍 Trailblazer</Badge>
             </td>
-            <td>1200</td>
+            <td>6000</td>
           </tr>
           <tr>
             <td>14</td>
@@ -239,7 +255,7 @@ const Milestones = () => {
             <td>
               <Badge className="Overlord">💥 Overlord</Badge>
             </td>
-            <td>9475</td>
+            <td>7500</td>
           </tr>
           <tr>
             <td>15</td>
@@ -247,7 +263,7 @@ const Milestones = () => {
             <td>
               <Badge className="Immortal">🌟 Immortal</Badge>
             </td>
-            <td>11375</td>
+            <td>9000</td>
           </tr>
         </tbody>
       </table>
