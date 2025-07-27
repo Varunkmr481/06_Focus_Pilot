@@ -806,7 +806,7 @@ const FocusMode = () => {
 
       const data = await res.json();
 
-      console.log("Updated data : ", data);
+      console.log("Updated data coming after end of focus timer : ", data);
       setPosi({
         currentBadge: data.currentUser.currentBadge,
         currentLevel: data.currentUser.currentLevel,
