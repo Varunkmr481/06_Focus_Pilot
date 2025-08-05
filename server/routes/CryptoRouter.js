@@ -29,6 +29,14 @@ cryptoRouter.get("/getUser", ensureAuthenticated, async (req, res) => {
   });
 });
 
+cryptoRouter.get("/getAllUsers", ensureAuthenticated, async (req, res) => {
+  const users = await User.find({});
+
+  return res.status(200).json({
+    users,
+  });
+});
+
 cryptoRouter.get("/home", ensureAuthenticated, async (req, res) => {
   const user = await User.find({ email: req.user.email });
   console.log(user[0]);

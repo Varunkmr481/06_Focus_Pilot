@@ -16,9 +16,11 @@ const userSchema = mongoose.Schema(
     },
     currentBadge: {
       type: String,
+      default: "Beginner",
     },
     currentTrophy: {
       type: String,
+      default: "🎖️",
     },
   },
   { timestamps: true }

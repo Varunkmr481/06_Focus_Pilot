@@ -43,6 +43,18 @@ const getDateRange = function (filter) {
     999
   );
 
+  const firstDayOfThisYear = new Date(now.getFullYear(), 0, 1);
+
+  const lastDayOfThisYear = new Date(
+    now.getFullYear(),
+    11,
+    31,
+    23,
+    59,
+    59,
+    999
+  );
+
   if (filter === "today")
     return {
       start: todayStart,
@@ -63,6 +75,12 @@ const getDateRange = function (filter) {
     return {
       start: firstDayOfLastMonth,
       end: lastDayOfLastMonth,
+    };
+
+  if (filter === "thisYear")
+    return {
+      start: firstDayOfThisYear,
+      end: lastDayOfThisYear,
     };
 
   return {};

@@ -1,5 +1,5 @@
 const levelThresholds = [
-  { level: 1, hours: 50, badge: "Novice", emoji: "🎖️" },
+  { level: 1, hours: 50, badge: "Novice", emoji: "🔰" },
   { level: 2, hours: 250, badge: "Apprentice", emoji: "🌟" },
   { level: 3, hours: 500, badge: "Journeyman", emoji: "🏅" },
   { level: 4, hours: 800, badge: "Expert", emoji: "🔥" },
