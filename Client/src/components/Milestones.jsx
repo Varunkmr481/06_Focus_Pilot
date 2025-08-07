@@ -1,272 +1,219 @@
 import styled from "styled-components";
 
 const StyledContainer = styled.div`
-  font-family: Arial, sans-serif;
-  /* margin: 20px; */
-  font-size: 0.7rem;
+  font-family: "Poppins", sans-serif;
+  overflow-x: scroll;
+  padding: 1rem;
+  text-align: center;
+  background: linear-gradient(to right, #f9f9f9, #f0f0f0);
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  width: 100%;
 
-  & > h2 {
-    margin-bottom: 0.3rem;
-  }
-
-  & > p {
-    margin-bottom: 1.5rem;
-  }
-
-  & > table {
-    width: 80%;
-    margin: 0 auto;
-    border-collapse: collapse;
-    text-align: center;
-  }
-
-  & > th,
-  td {
-    border: 2px solid #ddd;
-    padding: 10px;
-  }
-
-  & > th {
-    background-color: #f2f2f2;
-    font-weight: bold;
+  @media (min-width: 480px) {
+    padding: 1.5rem;
   }
 
   @media (min-width: 768px) {
-    font-size: 1.2rem;
-    padding: 13px;
+    padding: 2rem;
+  }
+
+  @media (min-width: 1024px) {
+    padding: 3rem;
   }
 `;
 
-const Head = styled.td`
+const Title = styled.h2`
+  font-size: 1.4rem;
+  margin-bottom: 0.3rem;
+  color: #333;
+
+  @media (min-width: 480px) {
+    font-size: 1.6rem;
+  }
+
+  @media (min-width: 768px) {
+    font-size: 2rem;
+  }
+`;
+
+const Subtext = styled.p`
+  color: #d7263d;
+  font-size: 0.9rem;
+  margin-bottom: 2rem;
+
+  @media (min-width: 480px) {
+    font-size: 1rem;
+  }
+`;
+
+const Table = styled.table`
+  width: 100%;
+  margin: 0 auto;
+  border-collapse: collapse;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(6px);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+  font-size: 0.8rem;
+
+  @media (min-width: 480px) {
+    font-size: 0.9rem;
+  }
+
+  @media (min-width: 768px) {
+    font-size: 1rem;
+    width: 90%;
+  }
+
+  @media (min-width: 1024px) {
+    width: 80%;
+  }
+`;
+
+const Th = styled.th`
+  background-color: #eeeeee;
   font-weight: 600;
+  padding: 10px;
+  font-size: 0.9rem;
+  color: #333;
+  border-bottom: 2px solid #ccc;
+
+  @media (min-width: 480px) {
+    font-size: 1rem;
+    padding: 12px;
+  }
+`;
+
+const Td = styled.td`
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
+  font-size: 0.85rem;
+
+  @media (min-width: 480px) {
+    padding: 10px;
+    font-size: 0.95rem;
+  }
 `;
 
 export const Badge = styled.span`
   display: inline-block;
   padding: 5px 10px;
-  font-size: 0.6rem;
-  border-radius: 5px;
-  color: black;
-  /* font-size: 14px; */
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: white;
+  margin: 0.2rem;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.15);
+  white-space: nowrap;
+
+  @media (min-width: 480px) {
+    font-size: 0.75rem;
+    padding: 6px 14px;
+  }
 
   &.Beginner {
-    background-color: rgb(220, 136, 57);
-    color: white;
+    background-color: #dc8839;
   }
   &.Novice {
     background-color: #4caf50;
-    color: white;
   }
   &.Apprentice {
     background-color: #2196f3;
-    color: white;
   }
   &.Journeyman {
     background-color: #ff9800;
-    color: white;
   }
   &.Expert {
     background-color: #e91e63;
-    color: white;
   }
   &.Master {
-    background-color: rgb(168, 27, 215);
-    color: white;
+    background-color: #a81bd7;
   }
   &.Champion {
     background-color: #009688;
-    color: white;
   }
   &.Hero {
     background-color: #ff5722;
-    color: white;
   }
   &.Legend {
     background-color: #795548;
-    color: white;
   }
   &.Mythic {
     background-color: #607d8b;
-    color: white;
   }
   &.Guardian {
     background-color: #3f51b5;
-    color: white;
   }
   &.Pioneer {
     background-color: #00bcd4;
-    color: white;
   }
   &.Vanguard {
-    background-color: rgb(255, 7, 7);
-    color: white;
+    background-color: #ff0707;
   }
   &.Trailblazer {
     background-color: #8bc34a;
-    color: white;
   }
   &.Overlord {
     background-color: #f44336;
-    color: white;
   }
   &.Immortal {
     background-color: #673ab7;
-    color: white;
-  }
-
-  @media (min-width: 768px) {
-    font-size: 0.8rem;
-    font-weight: 600;
   }
 `;
 
 const Milestones = () => {
+  const data = [
+    ["0", "Beginner", "🎖️", 0],
+    ["1", "Novice", "🎖️", 50],
+    ["2", "Apprentice", "🌟", 250],
+    ["3", "Journeyman", "🏅", 500],
+    ["4", "Expert", "🔥", 800],
+    ["5", "Master", "👑", 750],
+    ["6", "Champion", "🏆", 1000],
+    ["7", "Hero", "⚔️", 1200],
+    ["8", "Legend", "🌌", 1700],
+    ["9", "Mythic", "✨", 2400],
+    ["10", "Guardian", "🛡️", 3200],
+    ["11", "Pioneer", "🚀", 3900],
+    ["12", "Vanguard", "⚡", 4500],
+    ["13", "Trailblazer", "🌍", 6000],
+    ["14", "Overlord", "💥", 7500],
+    ["15", "Immortal", "🌟", 9000],
+  ];
+
   return (
     <StyledContainer>
-      <h2>Badges with Level Names</h2>
-      <p style={{ color: "red", fontSize: ".9rem" }}>
-        Points are awarded based on the total focus hours accumulated to date.
-      </p>
-      <table>
+      <Title>Milestone Badges</Title>
+      <Subtext>
+        Points are awarded based on total <strong>focus hours</strong>{" "}
+        accumulated.
+      </Subtext>
+      <Table>
         <thead>
           <tr>
-            <Head>Level No.</Head>
-            <Head>Level Name</Head>
-            <Head>Badge</Head>
-            <Head>Points</Head>
+            <Th>Level</Th>
+            <Th>Name</Th>
+            <Th>Badge</Th>
+            <Th>Points</Th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>0</td>
-            <td>Beginner</td>
-            <td>
-              <Badge className="Beginner">🎖️ Beginner</Badge>
-            </td>
-            <td>0</td>
-          </tr>
-          <tr>
-            <td>1</td>
-            <td>Novice</td>
-            <td>
-              <Badge className="Novice">🎖️ Novice</Badge>
-            </td>
-            <td>50</td>
-          </tr>
-          <tr>
-            <td>2</td>
-            <td>Apprentice</td>
-            <td>
-              <Badge className="Apprentice">🌟 Apprentice</Badge>
-            </td>
-            <td>250</td>
-          </tr>
-          <tr>
-            <td>3</td>
-            <td>Journeyman</td>
-            <td>
-              <Badge className="Journeyman">🏅 Journeyman</Badge>
-            </td>
-            <td>500</td>
-          </tr>
-          <tr>
-            <td>4</td>
-            <td>Expert</td>
-            <td>
-              <Badge className="Expert">🔥 Expert</Badge>
-            </td>
-            <td>800</td>
-          </tr>
-          <tr>
-            <td>5</td>
-            <td>Master</td>
-            <td>
-              <Badge className="Master">👑 Master</Badge>
-            </td>
-            <td>750</td>
-          </tr>
-          <tr>
-            <td>6</td>
-            <td>Champion</td>
-            <td>
-              <Badge className="Champion">🏆 Champion</Badge>
-            </td>
-            <td>1000</td>
-          </tr>
-          <tr>
-            <td>7</td>
-            <td>Hero</td>
-            <td>
-              <Badge className="Hero">⚔️ Hero</Badge>
-            </td>
-            <td>1200</td>
-          </tr>
-          <tr>
-            <td>8</td>
-            <td>Legend</td>
-            <td>
-              <Badge className="Legend">🌌 Legend</Badge>
-            </td>
-            <td>1700</td>
-          </tr>
-          <tr>
-            <td>9</td>
-            <td>Mythic</td>
-            <td>
-              <Badge className="Mythic">✨ Mythic</Badge>
-            </td>
-            <td>2400</td>
-          </tr>
-          <tr>
-            <td>10</td>
-            <td>Guardian</td>
-            <td>
-              <Badge className="Guardian">🛡️ Guardian</Badge>
-            </td>
-            <td>3200</td>
-          </tr>
-          <tr>
-            <td>11</td>
-            <td>Pioneer</td>
-            <td>
-              <Badge className="Pioneer">🚀 Pioneer</Badge>
-            </td>
-            <td>3900</td>
-          </tr>
-          <tr>
-            <td>12</td>
-            <td>Vanguard</td>
-            <td>
-              <Badge className="Vanguard">⚡ Vanguard</Badge>
-            </td>
-            <td>4500</td>
-          </tr>
-          <tr>
-            <td>13</td>
-            <td>Trailblazer</td>
-            <td>
-              <Badge className="Trailblazer">🌍 Trailblazer</Badge>
-            </td>
-            <td>6000</td>
-          </tr>
-          <tr>
-            <td>14</td>
-            <td>Overlord</td>
-            <td>
-              <Badge className="Overlord">💥 Overlord</Badge>
-            </td>
-            <td>7500</td>
-          </tr>
-          <tr>
-            <td>15</td>
-            <td>Immortal</td>
-            <td>
-              <Badge className="Immortal">🌟 Immortal</Badge>
-            </td>
-            <td>9000</td>
-          </tr>
+          {data.map(([level, name, emoji, points]) => (
+            <tr key={level}>
+              <Td>{level}</Td>
+              <Td>{name}</Td>
+              <Td>
+                <Badge className={name}>
+                  {emoji} {name}
+                </Badge>
+              </Td>
+              <Td>{points}</Td>
+            </tr>
+          ))}
         </tbody>
-      </table>
+      </Table>
     </StyledContainer>
   );
 };

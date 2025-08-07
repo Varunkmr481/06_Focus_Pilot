@@ -304,7 +304,8 @@ sessionRouter.patch(
       }
 
       // 5. Update user level and total time tracked and update the user attached to the session
-      const durationMs = updatedSession.endTime - updatedSession.startTime;
+      // To remove delay fixing it to Number(durationInHours.toFixed(4))
+      let durationMs = updatedSession.endTime - updatedSession.startTime;
       const sessionDurationHours = durationMs / (60 * 60 * 1000);
       const currentUser = await User.findById(req.user.id);
 
