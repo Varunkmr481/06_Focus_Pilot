@@ -194,12 +194,14 @@ const SignUp = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isFormChecked, setIsFormChecked] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   async function handleSubmit(e) {
     e.preventDefault();
 
     try {
+      setIsLoading(true);
       const data = { name, surname, email, password, confirmPassword };
       console.log(data);
 
@@ -244,6 +246,8 @@ const SignUp = () => {
     } catch (err) {
       console.log("catch err : ", err);
       toast.error(err.message || "Something went wrong 💥");
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -363,7 +367,7 @@ const SignUp = () => {
             </AgreementWrapper>
 
             <FormBtnWrapper>
-              <FormBtn>Create Account</FormBtn>
+              <FormBtn>{isLoading ? "Loading...." : "Create Account"}</FormBtn>
             </FormBtnWrapper>
           </Form>
 

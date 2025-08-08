@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FaInfoCircle, FaUser } from "react-icons/fa";
+import { FaInfoCircle, FaTable, FaTrophy, FaUser } from "react-icons/fa";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { GrTransaction } from "react-icons/gr";
 import { IoChatbubble, IoSettings } from "react-icons/io5";
@@ -15,6 +15,8 @@ import UserDropDown from "./components/UserDropDown";
 import { RiFocus2Fill, RiLogoutBoxRFill } from "react-icons/ri";
 import toast, { Toaster } from "react-hot-toast";
 import { useEffect } from "react";
+import Rank from "./pages/Rank";
+import { FaRankingStar } from "react-icons/fa6";
 
 const Container = styled.div`
   position: relative;
@@ -32,6 +34,29 @@ const Container = styled.div`
     }
     -ms-overflow-style: none; /* IE 10+ */
     scrollbar-width: none; /* Firefox */
+  }
+`;
+
+const Overlay = styled.div`
+  display: ${({ $isVisible }) => ($isVisible ? "flex" : "none")};
+  position: fixed;
+  height: 100vh;
+  width: auto;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  /* background-color: rgb(95, 0, 217, 0.4); */
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 `;
 
@@ -155,6 +180,10 @@ const Navbar = styled.div`
 `;
 
 const Hamburger = styled(GiHamburgerMenu)`
+  &:hover {
+    cursor: pointer;
+  }
+
   @media (min-width: 1024px) {
     display: none;
   }
@@ -193,10 +222,10 @@ const navLinks = [
     headerText: "DashBoard",
   },
   {
-    to: "/transactions",
-    icon: <GrTransaction />,
-    label: "Transaction",
-    headerText: "Recent Transactions",
+    to: "/sessiontable",
+    icon: <FaTable />,
+    label: "Session Table",
+    headerText: "Recent Sessions",
   },
   {
     to: "/Focusmode",
@@ -206,11 +235,32 @@ const navLinks = [
     className: "focus",
   },
   {
-    to: "/about",
-    icon: <FaInfoCircle />,
-    label: "About Us",
-    headerText: "About Us",
+    to: "/calender",
+    icon: <RiFocus2Fill />,
+    label: "Planner",
+    headerText: "Planner",
+    // className: "focus",
   },
+  {
+    to: "/milestones",
+    icon: <FaTrophy />,
+    label: "MileStones",
+    headerText: "MileStones",
+    // className: "focus",
+  },
+  {
+    to: "/rank",
+    icon: <FaRankingStar />,
+    label: "Leaderboards",
+    headerText: "Leaderboards",
+    // className: "focus",
+  },
+  // {
+  //   to: "/about",
+  //   icon: <FaInfoCircle />,
+  //   label: "About Us",
+  //   headerText: "About Us",
+  // },
   {
     to: "/support",
     icon: <MdSupportAgent />,
@@ -221,10 +271,50 @@ const navLinks = [
 ];
 
 const App = () => {
+  const navigate = useNavigate();
+  const [sessionData, setSessionData] = useState([]);
   const [headerText, setHeaderText] = useState("DashBoard");
   const [showSideBar, setShowSideBar] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(null);
-  const navigate = useNavigate();
+  const [currDeleteSessionId, setCurrDeleteSessionId] = useState(null);
+  const [currManageSessionId, setCurrManageSessionId] = useState(null);
+  const [currDisId, setCurrDisId] = useState(null);
+
+  useEffect(() => {
+    const getchSessionsOfCurrUser = async () => {
+      try {
+        // 1. get token
+        const token = localStorage.getItem("token");
+
+        // 2. send post req
+        const res = await fetch("http://localhost:8000/session/currAll", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            authorization: token,
+          },
+        });
+
+        const data = await res.json();
+
+        // 3. response handling
+        if (data.success) {
+          console.log("All sessions", data.sessions);
+          setSessionData([...data.sessions]);
+        } else {
+          toast.error(
+            data.error ||
+              data.message ||
+              "Something went wrong while fetching session details"
+          );
+        }
+      } catch (err) {
+        toast.error(err.message || "Something went wrong");
+      }
+    };
+
+    getchSessionsOfCurrUser();
+  }, []);
 
   // React Strict Mode ke wajah se development mode me useEffect do baar run hota hai intentionally.
   useEffect(() => {
@@ -360,9 +450,26 @@ const App = () => {
         </Navbar>
 
         <Content>
-          <Outlet />
+          <Outlet
+            context={{
+              currDeleteSessionId,
+              setCurrDeleteSessionId,
+              currManageSessionId,
+              setCurrManageSessionId,
+              currDisId,
+              setCurrDisId,
+              sessionData,
+              setSessionData,
+            }}
+          />
         </Content>
       </ContentContainer>
+
+      <Overlay
+        $isVisible={
+          currDeleteSessionId || currManageSessionId || currDisId !== null
+        }
+      />
     </Container>
   );
 };

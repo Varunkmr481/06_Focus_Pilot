@@ -16,8 +16,13 @@ import ResetPassword from "./components/ResetPassword";
 import VerifyEmail from "./pages/VerifyEmail";
 import { Toaster } from "react-hot-toast";
 import ExpiredJwt from "./pages/ExpiredJwt";
+import CalenderPage from "./pages/CalenderPage";
 import Profile from "./pages/Profile";
 import FocusMode from "./pages/FocusMode";
+import Rank from "./pages/Rank";
+// import PomodoroTimer from "./pages/PomodoroTimer";
+import Milestones from "./components/Milestones";
+import Bg from "./pages/Bg";
 
 // Password Reset Done
 /* <SuccessNotification
@@ -62,6 +67,7 @@ const GlobalStyle = createGlobalStyle`
 
   body{
       font-family: "Space Grotesk", sans-serif;
+      position: relative;
   }
 `;
 
@@ -72,12 +78,18 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       { index: true, element: <Home /> },
-      { path: "transactions", element: <Transactions /> },
+      { path: "sessiontable", element: <Transactions /> },
       { path: "about", element: <About /> },
       { path: "support", element: <Support /> },
       { path: "profile", element: <Profile /> },
       { path: "settings", element: <div>coming soon...</div> },
       { path: "focusmode", element: <FocusMode /> },
+      { path: "milestones", element: <Milestones /> },
+      { path: "rank", element: <Rank /> },
+      {
+        path: "/calender",
+        element: <CalenderPage />,
+      },
     ],
   },
   { path: "/signup", element: <SignUp /> },
@@ -90,6 +102,11 @@ const router = createBrowserRouter([
     element: <SignIn />,
   },
   {
+    path: "/test",
+    element: <Bg />,
+  },
+
+  {
     path: "/expired-jwt",
     element: (
       <ExpiredJwt
@@ -98,9 +115,6 @@ const router = createBrowserRouter([
         to="/login"
       />
     ),
-  },
-  {
-    path: "http://localhost:5173/profile",
   },
 ]);
 

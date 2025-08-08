@@ -474,7 +474,7 @@ const Transactions = () => {
   }
 
   const handleDeleteInvalidSession = async (e) => {
-    e.preventDefault();
+    e?.preventDefault();
 
     // 1. Extract token
     const token = localStorage.getItem("token");
