@@ -1,6 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
-import { NavLink } from "react-router";
+import { NavLink, useNavigate } from "react-router";
+import { IoLogOut, IoLogOutOutline, IoMoonOutline } from "react-icons/io5";
+import { MdDarkMode, MdLightMode } from "react-icons/md";
+import { FaMoon } from "react-icons/fa";
+import toast from "react-hot-toast";
 
 const AvatarWrapper = styled.div`
   position: relative;
@@ -10,10 +14,12 @@ const AvatarImage = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 1.4rem;
+  font-size: 1.5rem;
 
   &:hover {
     cursor: pointer;
+    transform: scale(1.15);
+    transition: all 0.3s ease-in-out;
   }
 
   @media (min-width: 596px) {
@@ -76,6 +82,38 @@ const AvatarName = styled.div`
   }
 `;
 
+const ColumnFlexDiv = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+
+  @media (min-width: 768px) {
+    gap: 1.2rem;
+  }
+`;
+
+const LogoutBtn = styled(IoLogOutOutline)`
+  font-size: 1.3rem;
+
+  &:hover {
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    transform: scale(1.15);
+  }
+
+  @media (min-width: 768px) {
+    font-size: 2.1rem;
+  }
+`;
+
+const DarkModeBtn = styled(IoMoonOutline)`
+  font-size: 1.2rem;
+
+  @media (min-width: 768px) {
+    font-size: 1.7rem;
+  }
+`;
+
 const UserDropDown = ({
   avatarMenuItems,
   userAvatar,
@@ -85,6 +123,7 @@ const UserDropDown = ({
   const [isAvatarClick, setIsAvatarClick] = useState(false);
   const avatarRef = useRef(null);
   const [loggedInUser, setLoggedInUser] = useState("user");
+  const navigate = useNavigate();
   console.log("avatarMenuItems", avatarMenuItems);
 
   useEffect(() => {
@@ -112,19 +151,37 @@ const UserDropDown = ({
     }
   }, []);
 
+  const logout = () => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    toast.success("Successfully logged out!");
+
+    setTimeout(() => {
+      navigate("/login");
+    }, 1000);
+  };
+
   return (
     <AvatarWrapper>
-      <AvatarInfo>
-        <AvatarName>Hello, {loggedInUser}</AvatarName>
-        <AvatarImage
-          ref={avatarRef}
-          onClick={() => {
-            setIsAvatarClick((prev) => !prev);
-          }}
-        >
-          {userAvatar}
-        </AvatarImage>
-      </AvatarInfo>
+      <ColumnFlexDiv>
+        <AvatarInfo>
+          <AvatarName>{loggedInUser}</AvatarName>
+
+          <AvatarImage
+            ref={avatarRef}
+            onClick={() => {
+              setIsAvatarClick((prev) => !prev);
+            }}
+          >
+            {userAvatar}
+          </AvatarImage>
+        </AvatarInfo>
+
+        <DarkModeBtn />
+        <LogoutBtn onClick={logout} />
+
+        {/* <MdLightMode /> */}
+      </ColumnFlexDiv>
 
       {/* <AvatarTriangle /> */}
       {isAvatarClick && (
