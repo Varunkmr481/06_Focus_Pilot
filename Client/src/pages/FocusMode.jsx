@@ -468,8 +468,9 @@ const EndSessionSummaryArea = styled.textarea`
 const initialSessionInfo = {
   taskTitle: "",
   sessionDuration: 5,
-  breakDuration: "1",
-  sessionGoal: "Deep work",
+  // breakDuration: "1",
+  breakDuration: "",
+  sessionGoal: "default",
   distractionInput: "", // for input field
   distractions: [],
   summary: "",
@@ -493,14 +494,15 @@ const FocusMode = () => {
   const [progress, setProgress] = useState(0); // circle
 
   // Timer Logic
-  const [totalTime, setTotalTime] = useState(50);
+  const [totalTime, setTotalTime] = useState("default");
   const [focusLength, setFocusLength] = useState(2); // One focus session
-  const [breakLength, setBreakLength] = useState(1); // Break after focus
+  const [breakLength, setBreakLength] = useState("default"); // Break after focus
   const [currentPhase, setCurrentPhase] = useState("Focus");
   const [timeLeft, setTimeLeft] = useState(0); // in sec
   const [isRunning, setIsRunning] = useState(false);
   const [sessionIndex, setSessionIndex] = useState(0);
   const [sessions, setSessions] = useState([]);
+  const [expectedTime, setExpectedTime] = useState(0);
   const distractionsRef = useRef([]);
   const focusAudioRef = useRef(null);
   const breakAudioRef = useRef(null);
@@ -670,6 +672,21 @@ const FocusMode = () => {
   const handleSessionStartForm = (e) => {
     e.preventDefault();
 
+    if (totalTime === "default") {
+      toast.error("Please select valid session duration");
+      return;
+    }
+
+    if (breakLength === "default") {
+      toast.error("Please select valid break duration");
+      return;
+    }
+
+    if (sessionInfo.sessionGoal === "default") {
+      toast.error("Please select valid session goal");
+      return;
+    }
+
     if (sessions.length > 0) {
       setIsDialogEnable(false);
       setIsRunning(true);
@@ -697,6 +714,11 @@ const FocusMode = () => {
       if (!sessionInfo.taskTitle) {
         throw new Error("Task title is required");
       }
+
+      // 1.1. Set expected time
+      setExpectedTime(currentTime + totalTime * 60000);
+      // console.log("jab timer Start hua : ", currentTime);
+      // console.log("timer ka duration h : ", totalTime);
 
       // 2. Create session info object
       const sessionObj = {
@@ -781,13 +803,17 @@ const FocusMode = () => {
 
   const SendDistractionToServer = async () => {
     try {
-      // 1. Send to backend immediately (optional but recommended)
+      // 0. Instant get the end time
+      // const endTime = Date.now();
+      const endTime = expectedTime;
+
+      // 1. Extract token from localStorage
       const token = localStorage.getItem("token");
 
       // console.log("Form distractions : ", currSID);
       const disObj = {
         distractions: distractionsRef.current,
-        endTime: Date.now(),
+        endTime: endTime,
         status: "completed",
       };
 
@@ -822,6 +848,8 @@ const FocusMode = () => {
     e.preventDefault();
 
     try {
+      const endTime = Date.now();
+
       if (!isRunning) {
         return toast.error(
           "Please start the session before performing this action."
@@ -832,7 +860,7 @@ const FocusMode = () => {
       const endObj = {
         summary: sessionInfo.summary,
         earlyEndReason: sessionInfo.earlyEndReason,
-        endTime: Date.now(),
+        endTime: endTime,
         distractions: distractionsRef.current,
         status: "early end",
       };
@@ -910,7 +938,8 @@ const FocusMode = () => {
     setSessions([]);
     setTimeLeft(0);
     setProgress(0);
-    setTotalTime(0);
+    setTotalTime("default");
+    setBreakLength("default");
     setCurrSID(""); // Optional: clear session id
     distractionsRef.current = [];
     setSessionInfo(initialSessionInfo);
@@ -1085,6 +1114,7 @@ const FocusMode = () => {
                 setTotalTime(e.target.value);
               }}
             >
+              <option value="default">Select Session Duration</option>
               <option value={2}>2 min</option>
               <option value={50}>50 min</option>
               <option value={100}>100 min</option>
@@ -1103,6 +1133,7 @@ const FocusMode = () => {
                 setBreakLength(e.target.value);
               }}
             >
+              <option value="default">Select Break Duration</option>
               <option value="1">1 min</option>
               <option value="5">5 min</option>
               <option value="10">10 min</option>
@@ -1121,6 +1152,7 @@ const FocusMode = () => {
                 });
               }}
             >
+              <option value="default">Select Session Goal</option>
               <optgroup label="Focused Work">
                 <option value="Deep work">Deep work</option>
                 <option value="Light task">Light task</option>
