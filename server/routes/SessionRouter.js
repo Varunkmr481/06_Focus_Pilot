@@ -370,4 +370,53 @@ sessionRouter.delete(
   }
 );
 
+// Pagination for sessions
+// /sessions?page=1&limit=10
+sessionRouter.get("/sessions", ensureAuthenticated, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+    const skip = (page - 1) * limit;
+    const search = req.query.search || "";
+    const range = req.query.range || "all";
+
+    // Build mongodb query & always filter by user
+    let query = { user: userId };
+
+    // Add search filter
+    if (search) {
+      query.$or = [
+        { taskTitle: { $regex: search, $options: "i" } },
+        { sessionGoal: { $regex: search, $options: "i" } },
+        { status: { $regex: search, $options: "i" } },
+      ];
+    }
+
+    // Add date range filter
+    const dateRange = getDateRange(range);
+    if (dateRange.start && dateRange.end) {
+      query.createdAt = { $gte: dateRange.start, $lte: dateRange.end };
+    }
+
+    // Count total matching sessions
+    const totalSessions = await Session.countDocuments(query);
+
+    const sessions = await Session.find(query)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    res.status(200).json({
+      success: true,
+      total: totalSessions,
+      page,
+      totalPages: Math.ceil(totalSessions / limit),
+      data: sessions,
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 module.exports = sessionRouter;
