@@ -1,18 +1,15 @@
 const getDuration = (endTime, startTime) => {
   let time;
   const durationMs = endTime - startTime;
-  const hrs = durationMs / (60 * 60 * 1000);
-  const mins = durationMs / (60 * 1000);
+  const hrs = Math.floor(durationMs / (60 * 60 * 1000));
+  const mins = Math.floor((durationMs / (60 * 1000)) % 60);
 
-  const flooredHr = Math.floor(hrs);
-  const flooredMin = Math.floor(mins);
-
-  if (flooredHr <= 1 && flooredMin <= 1) {
-    time = `${flooredHr} hr ${flooredMin} min`;
-  } else if (flooredHr <= 1 && flooredMin > 1) {
-    time = `${flooredHr} hr ${flooredMin} mins`;
-  } else if (flooredHr > 1 && flooredMin <= 1) {
-    time = `${flooredHr} hrs ${flooredMin} min`;
+  if (hrs <= 1 && mins <= 1) {
+    time = `${hrs} hr ${mins} min`;
+  } else if (hrs <= 1 && mins > 1) {
+    time = `${hrs} hr ${mins} mins`;
+  } else if (hrs > 1 && mins <= 1) {
+    time = `${hrs} hrs ${mins} min`;
   }
 
   return { duration: durationMs, flooredtime: time };
