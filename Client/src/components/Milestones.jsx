@@ -226,12 +226,13 @@ const StyledContainer = styled.div`
   font-family: "Poppins", sans-serif;
   padding: 2rem;
   text-align: center;
-  background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(12px) saturate(150%);
   border-radius: 16px;
   background: linear-gradient(135deg, #d9e4f5 0%, #f7d9e3 100%);
-  /* box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15); */
-  width: 100%;
+  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+  /* width: 100%; */
+  max-width: 100%;
+  /* margin: 2rem auto; */
   animation: fadeIn 0.3s ease;
 
   @keyframes fadeIn {
@@ -246,13 +247,15 @@ const StyledContainer = styled.div`
   }
 `;
 
-const Title = styled.h2`
-  font-size: 1.8rem;
-  margin-bottom: 0.3rem;
+const Title = styled.h1`
+  text-align: center;
+  font-size: 2.2rem;
+  font-weight: 550;
+  margin-bottom: 1.5rem;
   background: linear-gradient(90deg, #7f00ff, #e100ff);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  font-weight: 700;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 `;
 
 const Subtext = styled.p`
@@ -283,11 +286,11 @@ const Table = styled.table`
 
 const Th = styled.th`
   background: linear-gradient(135deg, #7f00ff, #e100ff);
-  font-weight: 600;
   padding: 14px;
   font-size: 1rem;
-  color: white;
-  border-bottom: 2px solid rgba(255, 255, 255, 0.15);
+  font-weight: 600;
+  color: rgba(255, 255, 255, 1);
+  border-bottom: 1px solid rgba(48, 48, 48, 0.15);
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 `;
 
@@ -387,7 +390,7 @@ const Milestones = () => {
 
   return (
     <StyledContainer>
-      <Title>Milestone Badges</Title>
+      <Title>🏆 Milestone Badges</Title>
       <Subtext>
         Points are awarded based on total <strong>focus hours</strong>{" "}
         accumulated.
