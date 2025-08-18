@@ -18,6 +18,8 @@ function getHeaderTitle(path) {
       return "Profile";
     case "/settings":
       return "Settings";
+    case "/ds":
+      return "New Dashboard";
     default:
       return "Dashboard";
   }
