@@ -335,6 +335,54 @@ const DeleteBtn = styled(MdDelete)`
   }
 `;
 
+const PaginationContainer = styled.div`
+  margin-top: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 18px rgba(98, 98, 98, 1);
+`;
+
+const PageButton = styled.button`
+  background: linear-gradient(135deg, #6a00f4, #9d00ff);
+  color: white;
+  font-weight: 500;
+  border: none;
+  padding: 0.5rem 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(109, 0, 255, 0.4);
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(109, 0, 255, 0.6);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background: rgb(59, 59, 59);
+    box-shadow: none;
+  }
+`;
+
+const PageInfo = styled.span`
+  font-size: 0.95rem;
+  color: #9d00ff;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  backdrop-filter: blur(6px);
+`;
 // MODAL BOX
 
 const onSearchFocus = function (inputRef) {
@@ -347,6 +395,10 @@ const Transactions = () => {
   const [activeFilter, setActiveFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
 
+  const [pgSessions, setPgSessions] = useState([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
   const inputRef = useRef(null);
   const {
     currDeleteSessionId,
@@ -358,6 +410,38 @@ const Transactions = () => {
     sessionData,
     setSessionData,
   } = useOutletContext();
+
+  useEffect(() => {
+    async function fetchPagedSessions() {
+      try {
+        const res = await fetch(
+          `http://localhost:8000/sessions?page=${page}&limit=5&search=${encodeURIComponent(
+            searchQuery
+          )}&range=${activeFilter}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              authorization: localStorage.getItem("token"),
+            },
+          }
+        );
+
+        const data = await res.json();
+
+        console.log(data);
+        console.log(data.data);
+        console.log(data.totalPages);
+
+        setPgSessions(data.data);
+        setTotalPages(Number(data.totalPages));
+      } catch (err) {
+        toast.error(err.message);
+      }
+    }
+
+    fetchPagedSessions();
+  }, [page, activeFilter, searchQuery]);
 
   useEffect(() => {
     async function updateSession() {
@@ -397,81 +481,81 @@ const Transactions = () => {
     return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
 
-  useEffect(() => {
-    const deleteInvalidSessions = async () => {
-      try {
-        // 1. extract token
-        const token = localStorage.getItem("token");
+  // useEffect(() => {
+  //   const deleteInvalidSessions = async () => {
+  //     try {
+  //       // 1. extract token
+  //       const token = localStorage.getItem("token");
 
-        // 2. send api req
-        const res = await fetch("http://localhost:8000/session/delete-broken", {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            authorization: token,
-          },
-        });
+  //       // 2. send api req
+  //       const res = await fetch("http://localhost:8000/session/delete-broken", {
+  //         method: "DELETE",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           authorization: token,
+  //         },
+  //       });
 
-        const data = await res.json();
+  //       const data = await res.json();
 
-        if (data.succes) {
-          console.log(data);
-        }
-      } catch (err) {
-        toast.error(err.message);
-      }
-    };
+  //       if (data.succes) {
+  //         console.log(data);
+  //       }
+  //     } catch (err) {
+  //       toast.error(err.message);
+  //     }
+  //   };
 
-    // deleteInvalidSessions();
-  }, []);
+  //   // deleteInvalidSessions();
+  // }, []);
 
   // Yeh koi function nahi hai.
-  const filteredSessionsWithInput = useMemo(() => {
-    return sessionData.filter((session) => {
-      const query = searchQuery.toLowerCase();
+  // const filteredSessionsWithInput = useMemo(() => {
+  //   return sessionData.filter((session) => {
+  //     const query = searchQuery.toLowerCase();
 
-      return (
-        session.taskTitle.toLowerCase().includes(query) ||
-        session.sessionGoal.toLowerCase().includes(query) ||
-        session.status?.toLowerCase()?.includes(query)
-      );
-    });
-  }, [searchQuery, sessionData]);
+  //     return (
+  //       session.taskTitle.toLowerCase().includes(query) ||
+  //       session.sessionGoal.toLowerCase().includes(query) ||
+  //       session.status?.toLowerCase()?.includes(query)
+  //     );
+  //   });
+  // }, [searchQuery, sessionData]);
 
-  async function filterSessionWithRange(range) {
-    try {
-      // 1. Extract the token
-      const token = localStorage.getItem("token");
+  // async function filterSessionWithRange(range) {
+  //   try {
+  //     // 1. Extract the token
+  //     const token = localStorage.getItem("token");
 
-      // 2. Send the api request
-      const res = await fetch(
-        `http://localhost:8000/session/filter?range=${range}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            authorization: token,
-          },
-        }
-      );
+  //     // 2. Send the api request
+  //     const res = await fetch(
+  //       `http://localhost:8000/session/filter?range=${range}`,
+  //       {
+  //         method: "GET",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           authorization: token,
+  //         },
+  //       }
+  //     );
 
-      const data = await res.json();
+  //     const data = await res.json();
 
-      if (data.success) {
-        if (data.sessions.length === 0) {
-          setSessionData(data.sessions);
-          toast.error("No sessions found!");
-        } else {
-          setSessionData(data.sessions);
-          toast.success("Session filtered!");
-        }
-      } else {
-        toast.error("Failed to fetch sessions");
-      }
-    } catch (err) {
-      toast.error(err.message);
-    }
-  }
+  //     if (data.success) {
+  //       if (data.sessions.length === 0) {
+  //         setSessionData(data.sessions);
+  //         toast.error("No sessions found!");
+  //       } else {
+  //         setSessionData(data.sessions);
+  //         toast.success("Session filtered!");
+  //       }
+  //     } else {
+  //       toast.error("Failed to fetch sessions");
+  //     }
+  //   } catch (err) {
+  //     toast.error(err.message);
+  //   }
+  // }
 
   const handleDeleteInvalidSession = async (e) => {
     e?.preventDefault();
@@ -494,7 +578,7 @@ const Transactions = () => {
     const data = await res.json();
 
     console.log("Helo", data.message, data.id);
-    setSessionData((prev) => prev.filter((s) => s._id !== currDeleteSessionId));
+    setPgSessions((prev) => prev.filter((s) => s._id !== currDeleteSessionId));
     setCurrDeleteSessionId(null);
   };
 
@@ -525,13 +609,13 @@ const Transactions = () => {
         toast.success("Session successfully updated!");
         console.log(data.updatedSession);
 
-        setSessionData((prev) => {
-          return prev.map((s) => {
-            return s._id === id && data.updatedSession
-              ? data.updatedSession
-              : s;
-          });
-        });
+        setPgSessions((prev) =>
+          prev.map((s) =>
+            s._id === id
+              ? { ...s, ...data.updatedSession } // merge ensures new reference
+              : s
+          )
+        );
       } else {
         toast.error(data.message || "Failed to update session");
       }
@@ -544,10 +628,10 @@ const Transactions = () => {
 
   return (
     <GridContentTransaction>
-      <ExportBtn>
+      {/* <ExportBtn>
         <FaDownload />
         <span>Export CSV</span>
-      </ExportBtn>
+      </ExportBtn> */}
 
       {isMobile ? (
         <TransactionViewRestriction />
@@ -559,7 +643,7 @@ const Transactions = () => {
               className={activeFilter === "all" ? "active" : ""}
               onClick={() => {
                 setActiveFilter("all");
-                filterSessionWithRange("all");
+                // filterSessionWithRange("all");
               }}
             >
               <span>All</span>
@@ -569,7 +653,7 @@ const Transactions = () => {
               className={activeFilter === "today" ? "active" : ""}
               onClick={() => {
                 setActiveFilter("today");
-                filterSessionWithRange("today");
+                // filterSessionWithRange("today");
               }}
             >
               <span>Today</span>
@@ -579,7 +663,7 @@ const Transactions = () => {
               className={activeFilter === "yesterday" ? "active" : ""}
               onClick={() => {
                 setActiveFilter("yesterday");
-                filterSessionWithRange("yesterday");
+                // filterSessionWithRange("yesterday");
               }}
             >
               <span>Yesterday</span>
@@ -589,7 +673,7 @@ const Transactions = () => {
               className={activeFilter === "thisMonth" ? "active" : ""}
               onClick={() => {
                 setActiveFilter("thisMonth");
-                filterSessionWithRange("thisMonth");
+                // filterSessionWithRange("thisMonth");
               }}
             >
               <span>This Month</span>
@@ -599,7 +683,7 @@ const Transactions = () => {
               className={activeFilter === "lastMonth" ? "active" : ""}
               onClick={() => {
                 setActiveFilter("lastMonth");
-                filterSessionWithRange("lastMonth");
+                // filterSessionWithRange("lastMonth");
               }}
             >
               <span>Last Month</span>
@@ -637,12 +721,12 @@ const Transactions = () => {
 
           {/* TABLE DATA */}
           <TableBody>
-            {filteredSessionsWithInput.length === 0 ? (
+            {pgSessions.length === 0 ? (
               <NoSessionFound>
                 No sessions found. Try adjusting your filters.
               </NoSessionFound>
             ) : (
-              filteredSessionsWithInput.map((data, index) => {
+              pgSessions.map((data, index) => {
                 const { date, time } = separateDateTime(data.createdAt);
                 const { duration, flooredtime } = getDuration(
                   data.endTime,
@@ -759,6 +843,29 @@ const Transactions = () => {
             )}
           </TableBody>
         </Table>
+      )}
+
+      {/* Pagination Buttons */}
+      {isMobile ? null : (
+        <PaginationContainer>
+          <PageButton
+            onClick={() => setPage((p) => Math.max(p - 1, 1))}
+            disabled={page === 1}
+          >
+            Prev
+          </PageButton>
+
+          <PageInfo>
+            Page {page} of {totalPages}
+          </PageInfo>
+
+          <PageButton
+            onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
+            disabled={page === totalPages}
+          >
+            Next
+          </PageButton>
+        </PaginationContainer>
       )}
     </GridContentTransaction>
   );
