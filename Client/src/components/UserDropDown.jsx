@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { NavLink, useNavigate } from "react-router";
 import { IoLogOut, IoLogOutOutline, IoMoonOutline } from "react-icons/io5";
-import { MdDarkMode, MdLightMode } from "react-icons/md";
+import { MdDarkMode, MdLightMode, MdSupportAgent } from "react-icons/md";
 import { FaMoon } from "react-icons/fa";
 import toast from "react-hot-toast";
 
@@ -106,8 +106,28 @@ const LogoutBtn = styled(IoLogOutOutline)`
   }
 `;
 
+const CustomerCare = styled(MdSupportAgent)`
+  font-size: 1.3rem;
+
+  &:hover {
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    transform: scale(1.15);
+  }
+
+  @media (min-width: 768px) {
+    font-size: 2.1rem;
+  }
+`;
+
 const DarkModeBtn = styled(IoMoonOutline)`
   font-size: 1.2rem;
+
+  &:hover {
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    transform: scale(1.15);
+  }
 
   @media (min-width: 768px) {
     font-size: 1.7rem;
@@ -161,6 +181,10 @@ const UserDropDown = ({
     }, 1000);
   };
 
+  const handleCustomerCare = () => {
+    navigate("/support");
+  };
+
   return (
     <AvatarWrapper>
       <ColumnFlexDiv>
@@ -178,6 +202,7 @@ const UserDropDown = ({
         </AvatarInfo>
 
         <DarkModeBtn />
+        <CustomerCare onClick={handleCustomerCare} />
         <LogoutBtn onClick={logout} />
 
         {/* <MdLightMode /> */}
