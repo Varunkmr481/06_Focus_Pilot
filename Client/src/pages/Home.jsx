@@ -34,7 +34,7 @@ const Progression = styled.div`
   }};
 `;
 
-export const ClockProgressionContainer = styled.div`
+const ClockProgressionContainer = styled.div`
   display: flex;
   align-items: center;
   gap: 0.4rem;
@@ -68,7 +68,7 @@ const TrendDown = styled(FaArrowTrendDown)`
   color: red;
 `;
 
-export const Rough = styled.div`
+const Rough = styled.div`
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -79,6 +79,7 @@ export const Rough = styled.div`
   color: #1f2937;
   font-weight: 600;
   z-index: 1;
+  /* overflow: hidden; */
 
   & button {
     border: none;
@@ -192,12 +193,13 @@ export const Rough = styled.div`
   }
 `;
 
-export const FilterBox = styled.div`
+const FilterBox = styled.div`
   display: flex;
   /* justify-content: flex-end; */
   justify-content: space-between;
   align-items: center;
   width: 100%;
+  height: fit-content;
   border: 1.6px solid #5f00d9;
   background: #f9fafb;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
@@ -212,7 +214,7 @@ export const FilterBox = styled.div`
   }
 `;
 
-export const DropdownWrapper = styled.div`
+const DropdownWrapper = styled.div`
   display: none;
 
   @media (max-width: 596px) {
@@ -405,7 +407,7 @@ export const GridContent = styled.div`
   }
 `;
 
-export const ClockValue = styled.div`
+const ClockValue = styled.div`
   font-size: 0.8rem;
   font-weight: 900;
 
@@ -533,13 +535,7 @@ const PodiumIcon = styled(IoPodiumOutline)`
   }
 `;
 
-export const ColorIcons = ({
-  bgColor,
-  icon: Icon,
-  size,
-  color,
-  extendedsize,
-}) => {
+const ColorIcons = ({ bgColor, icon: Icon, size, color, extendedsize }) => {
   // const DynamicIcon = getStyledIcon(icon);
   // console.log(DynamicIcon);
 
