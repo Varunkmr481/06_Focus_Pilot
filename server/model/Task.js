@@ -20,7 +20,6 @@ const taskSchema = mongoose.Schema(
     },
     category: {
       type: String,
-      enum: ["work", "study", "personal"],
       default: "personal",
     },
     color: { type: String, default: "#5834db" },

@@ -10,6 +10,10 @@ const userSchema = mongoose.Schema(
       type: Number,
       default: 0, // Total hours accumulated from sessions
     },
+    totalTimePlanned: {
+      type: Number,
+      default: 0,
+    },
     currentLevel: {
       type: Number,
       default: 0, // Start at Level 1
@@ -21,6 +25,10 @@ const userSchema = mongoose.Schema(
     currentTrophy: {
       type: String,
       default: "🎖️",
+    },
+    categories: {
+      type: [{ name: String, color: String }],
+      default: [],
     },
   },
   { timestamps: true }
