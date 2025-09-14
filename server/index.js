@@ -11,6 +11,7 @@ const Authrouter = require("./routes/AuthRouter");
 const cryptoRouter = require("./routes/CryptoRouter");
 const sessionRouter = require("./routes/SessionRouter");
 const taskRouter = require("./routes/TaskRouter");
+const userRouter = require("./routes/UserRouter");
 const app = express();
 const port = 8000;
 
@@ -56,6 +57,7 @@ app.delete("/all", async (req, res) => {
 
 app.use("/", Authrouter);
 app.use("/", cryptoRouter);
+app.use("/", userRouter);
 app.use("/", sessionRouter);
 app.use("/", taskRouter);
 

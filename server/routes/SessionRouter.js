@@ -6,6 +6,100 @@ const getLevelFromHours = require("../utils/getLevelFromHours");
 const getDateRange = require("../utils/getDateRange");
 const sessionRouter = require("express").Router();
 
+// sessionRouter.patch(
+//   "/session/manageinvalid/:id",
+//   ensureAuthenticated,
+//   async (req, res) => {
+//     try {
+//       const userId = req.user.id;
+//       const { id: sessionId } = req.params;
+//       const { durationMs } = req.body;
+
+//       if (!durationMs || durationMs < 0) {
+//         return res.status(400).json({
+//           success: false,
+//           message: "Invalid session duration.",
+//           error: "Duration is required and must be a positive number.",
+//         });
+//       }
+
+//       // 1. Get the current session details first
+//       const currentSession = await Session.findById(sessionId);
+
+//       if (!currentSession) {
+//         return res.status(404).json({
+//           success: false,
+//           message: "Session not found",
+//           error: "Session not found",
+//         });
+//       }
+
+//       // 2. Check user authorization
+//       if (currentSession.user.toString() !== userId) {
+//         return res.status(403).json({
+//           success: false,
+//           message: "Unauthorized to update this session",
+//           error: "Unauthorized",
+//         });
+//       }
+
+//       // 3. Update the session in one go
+//       const updatedSession = await Session.findByIdAndUpdate(
+//         sessionId,
+//         {
+//           $set: {
+//             endTime: currentSession.startTime + durationMs,
+//             status: "completed",
+//           },
+//         },
+//         { new: true }
+//       );
+
+//       // 4. Update user details based on the new session duration
+//       const sessionDurationHours = durationMs / (60 * 60 * 1000);
+//       const currentUser = await User.findById(userId);
+
+//       if (!currentUser) {
+//         return res.status(404).json({
+//           success: false,
+//           message: "User not found",
+//           error: "User not found",
+//         });
+//       }
+
+//       const newTotalHours = currentUser.totalHours + sessionDurationHours;
+//       const { level, badge, emoji } = getLevelFromHours(newTotalHours);
+
+//       const updatedUser = await User.findByIdAndUpdate(
+//         userId,
+//         {
+//           $set: {
+//             totalHours: newTotalHours,
+//             currentLevel: level,
+//             currentBadge: badge,
+//             currentTrophy: emoji,
+//           },
+//         },
+//         { new: true }
+//       );
+
+//       return res.json({
+//         success: true,
+//         message: "Session and user updated successfully",
+//         updatedSession,
+//         currentUser: updatedUser,
+//       });
+//     } catch (err) {
+//       console.error(err);
+//       return res.status(500).json({
+//         success: false,
+//         message: err.message,
+//         error: err.message,
+//       });
+//     }
+//   }
+// );
+
 sessionRouter.patch(
   `/session/manageinvalid/:id`,
   ensureAuthenticated,
@@ -29,6 +123,10 @@ sessionRouter.patch(
       }
 
       currentUser.totalHours = currentUser.totalHours + sessionDurationHours;
+      const { level, badge, emoji } = getLevelFromHours(currentUser.totalHours);
+      currentUser.currentLevel = level;
+      currentUser.currentBadge = badge;
+      currentUser.currentTrophy = emoji;
       await currentUser.save();
 
       // 3. update the session
@@ -278,7 +376,7 @@ sessionRouter.patch(
       // summary, earlyEndReason, actualEndtime
       const body = req.body;
 
-      console.log("incoming bosy", body);
+      console.log("incoming body : ", body);
 
       // 2. update the database with specific id
       const updatedSession = await Session.findByIdAndUpdate(sessionId, body, {
