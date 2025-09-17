@@ -1,22 +1,42 @@
 import { useState } from "react";
-import { FaInfoCircle, FaTable, FaTrophy, FaUser } from "react-icons/fa";
+import {
+  FaCalendarCheck,
+  FaInfoCircle,
+  FaRegUser,
+  FaTable,
+  FaTrophy,
+  FaUser,
+} from "react-icons/fa";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { GrTransaction } from "react-icons/gr";
-import { IoChatbubble, IoSettings } from "react-icons/io5";
+import { IoChatbubble, IoSettings, IoSettingsOutline } from "react-icons/io5";
 import {
   MdMail,
   MdSpaceDashboard,
   MdSupportAgent,
   MdAccountCircle,
+  MdTimer,
 } from "react-icons/md";
-import { Navigate, NavLink, Outlet, useNavigate } from "react-router";
+import {
+  Navigate,
+  NavLink,
+  Outlet,
+  useLocation,
+  useNavigate,
+} from "react-router";
 import styled from "styled-components";
 import UserDropDown from "./components/UserDropDown";
-import { RiFocus2Fill, RiLogoutBoxRFill } from "react-icons/ri";
+import {
+  RiCalendarScheduleFill,
+  RiFocus2Fill,
+  RiLogoutBoxRFill,
+} from "react-icons/ri";
 import toast, { Toaster } from "react-hot-toast";
 import { useEffect } from "react";
 import Rank from "./pages/Rank";
 import { FaRankingStar } from "react-icons/fa6";
+import getHeaderTitle from "./utils/getHeaderTitle";
+import { SlCalender } from "react-icons/sl";
 
 const Container = styled.div`
   position: relative;
@@ -26,7 +46,10 @@ const Container = styled.div`
   /* background-color: lightpink; */
   display: flex;
   box-sizing: border-box;
-  overflow-y: ${({ $showSideBar }) => ($showSideBar ? "auto" : "scroll")};
+
+  /* C-1 (comnt out this) */
+  /* overflow-y: ${({ $showSideBar }) => ($showSideBar ? "auto" : "scroll")}; */
+  overflow-y: hidden; /* Remove auto/scroll from Container */
 
   @media (min-width: 1024px) {
     &::-webkit-scrollbar {
@@ -61,6 +84,8 @@ const Overlay = styled.div`
 `;
 
 const Sidebar = styled.div`
+  /* C-4 (will-chng) */
+  will-change: transform;
   width: 100vw;
   height: 100vh;
   display: flex;
@@ -100,7 +125,7 @@ const Credit = styled.div`
 const SidebarMenu = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 3vh;
+  gap: 1.5vh;
 
   @media (min-width: 1024px) {
     padding-top: 17vh;
@@ -112,7 +137,7 @@ const Redirect = styled(NavLink)`
   align-items: center;
   gap: 8px;
   width: 100%;
-  padding: 2vh;
+  padding: 1.8vh;
   border-radius: 0.3rem;
   text-decoration: none;
   font-size: 1.2rem;
@@ -133,6 +158,8 @@ const Redirect = styled(NavLink)`
 `;
 
 const ContentContainer = styled.div`
+  /* C-3 (will-chng) */
+  will-change: transform;
   /* height maybe auto krna pde */
   height: 100vh;
   width: 100vw;
@@ -154,6 +181,7 @@ const Navbar = styled.div`
   justify-content: space-between;
   align-items: center;
   height: 15vh;
+  /* z-index: 999999999999999999999999999999999; */
   /* width: 100vw; */
   /* background-color: cornflowerblue; */
   background-color: #5f00d9;
@@ -191,8 +219,7 @@ const Hamburger = styled(GiHamburgerMenu)`
 
 const Content = styled.div`
   height: auto;
-  /* background-color: yellowgreen; */
-  background-color: rgb(236, 236, 236);
+  background: linear-gradient(135deg, #d9e4f5 0%, #f7d9e3 100%);
   padding: 3vh 2vh;
 
   @media (min-width: 480px) {
@@ -206,54 +233,81 @@ const Content = styled.div`
   @media (min-width: 1024px) {
     padding: 4vh 5vh;
     height: 85vh;
-    overflow-y: scroll;
-    scroll-behavior: smooth;
+
+    /* C-2 (cmnt out overflow and scroll-b)*/
+    /* overflow-y: scroll;
+    scroll-behavior: smooth; */
+    overflow-y: auto; /* Let Content handle scrolling */
+    height: 85vh; // Ensure consistent height
+    scroll-behavior: auto;
+
     &::-webkit-scrollbar {
       display: none;
     }
   }
 `;
 
+const StyledBetaTag = styled.div`
+  width: 100%;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  background-color: rgba(255, 255, 255, 0.2);
+  /* background-color: aquamarine; */
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(10px) saturate(180%);
+  -webkit-backdrop-filter: blur(10px) saturate(180%);
+  color: #5f00d9;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 1rem; /* Equivalent to text-xs in Tailwind */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+`;
+
 const navLinks = [
   {
     to: "/",
     icon: <MdSpaceDashboard />,
-    label: "Home",
-    headerText: "DashBoard",
+    label: "Dashboard",
+    children: [
+      {
+        to: "/",
+        label: "Focusmode",
+        // icon: <MdTimer />,
+      },
+      {
+        to: "/planner-dashboard",
+        label: "Planner",
+        // icon: <FaCalendarCheck />,
+      },
+    ],
   },
   {
     to: "/sessiontable",
     icon: <FaTable />,
     label: "Session Table",
-    headerText: "Recent Sessions",
   },
   {
-    to: "/Focusmode",
+    to: "/focusmode",
     icon: <RiFocus2Fill />,
     label: "Focus Mode",
-    headerText: "Focus Mode",
     className: "focus",
   },
   {
-    to: "/calender",
-    icon: <RiFocus2Fill />,
+    to: "/planner",
+    icon: <RiCalendarScheduleFill />,
     label: "Planner",
-    headerText: "Planner",
-    // className: "focus",
   },
   {
     to: "/milestones",
     icon: <FaTrophy />,
     label: "MileStones",
-    headerText: "MileStones",
-    // className: "focus",
   },
   {
-    to: "/rank",
+    to: "/leaderboard",
     icon: <FaRankingStar />,
     label: "Leaderboards",
-    headerText: "Leaderboards",
-    // className: "focus",
   },
   // {
   //   to: "/about",
@@ -261,19 +315,22 @@ const navLinks = [
   //   label: "About Us",
   //   headerText: "About Us",
   // },
-  {
-    to: "/support",
-    icon: <MdSupportAgent />,
-    label: "Support",
-    headerText: "Customer Care",
-    className: "support",
-  },
+  // {
+  //   to: "/support",
+  //   icon: <MdSupportAgent />,
+  //   label: "Support",
+  //   // headerText: "Customer Care",
+  //   className: "support",
+  // },
 ];
 
 const App = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [sessionData, setSessionData] = useState([]);
-  const [headerText, setHeaderText] = useState("DashBoard");
+  const [headerText, setHeaderText] = useState(
+    getHeaderTitle(location.pathname)
+  );
   const [showSideBar, setShowSideBar] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(null);
   const [currDeleteSessionId, setCurrDeleteSessionId] = useState(null);
@@ -281,7 +338,12 @@ const App = () => {
   const [currDisId, setCurrDisId] = useState(null);
 
   useEffect(() => {
-    const getchSessionsOfCurrUser = async () => {
+    // location.pathname
+    setHeaderText(getHeaderTitle(location.pathname));
+  }, [location.pathname]);
+
+  useEffect(() => {
+    const fetchSessionsOfCurrUser = async () => {
       try {
         // 1. get token
         const token = localStorage.getItem("token");
@@ -313,7 +375,7 @@ const App = () => {
       }
     };
 
-    getchSessionsOfCurrUser();
+    fetchSessionsOfCurrUser();
   }, []);
 
   // React Strict Mode ke wajah se development mode me useEffect do baar run hota hai intentionally.
@@ -364,30 +426,16 @@ const App = () => {
 
   const avatarMenuItems = [
     {
-      label: "Profile",
-      icon: <FaUser />,
+      label: "Account",
+      icon: <FaRegUser />,
       action: () => console.log("Go to Profile"),
       to: "/profile",
     },
     {
       label: "Settings",
-      icon: <IoSettings />,
+      icon: <IoSettingsOutline />,
       action: () => console.log("Open Settings"),
       to: "/settings",
-    },
-    {
-      label: "Logout",
-      icon: <RiLogoutBoxRFill />,
-      action: () => {
-        localStorage.removeItem("user");
-        localStorage.removeItem("token");
-        toast.success("Successfully logged out!");
-
-        setTimeout(() => {
-          navigate("/login");
-        }, 1000);
-      },
-      // to: "/transactions",
     },
   ];
 
@@ -407,23 +455,54 @@ const App = () => {
         <SidebarMenu>
           {navLinks.map((link, index) => {
             return (
-              <Redirect
-                key={index}
-                className={link?.className}
-                to={link.to}
-                onClick={() => {
-                  setHeaderText(link.headerText);
-                  setShowSideBar(false);
-                }}
-              >
-                {link.icon}
-                <span>{link.label}</span>
-              </Redirect>
+              <div key={index}>
+                <Redirect
+                  className={link?.className}
+                  to={link.to}
+                  onClick={() => {
+                    // setHeaderText(link.headerText);
+                    setShowSideBar(false);
+                  }}
+                >
+                  {link.icon}
+                  <span>{link.label}</span>
+                </Redirect>
+
+                {/* Agar children hain toh unhe render karo */}
+                {link.children && (
+                  <div
+                    style={{
+                      marginLeft: "25px",
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "1vh",
+                      marginTop: "0.3rem",
+                    }}
+                  >
+                    {link.children.map((child, idx) => (
+                      <Redirect
+                        key={idx}
+                        to={child.to}
+                        onClick={() => setShowSideBar(false)}
+                        style={{
+                          fontSize: "1.1rem",
+                          fontWeight: "800",
+                          padding: "1.5vh",
+                        }}
+                      >
+                        {child.icon ? child.icon : "➤"} {child.label}
+                      </Redirect>
+                    ))}
+                  </div>
+                )}
+              </div>
             );
           })}
         </SidebarMenu>
 
-        <Credit>
+        {<StyledBetaTag>BETA 1.0</StyledBetaTag>}
+
+        {/* <Credit>
           Credit : design by{" "}
           <NavLink
             to="https://www.youtube.com/@dosomecoding"
@@ -431,7 +510,7 @@ const App = () => {
           >
             @DoSomeCoding❤️
           </NavLink>
-        </Credit>
+        </Credit> */}
       </Sidebar>
 
       <ContentContainer $showSideBar={showSideBar}>

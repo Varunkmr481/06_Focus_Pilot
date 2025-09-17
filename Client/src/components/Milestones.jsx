@@ -1,4 +1,6 @@
-import styled, { keyframes } from "styled-components";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import styled, { css, keyframes } from "styled-components";
 
 // --- Data Transformation (same as before) ---
 const milestonesData = [
@@ -19,6 +21,129 @@ const milestonesData = [
   { level: "14", name: "Overlord", emoji: "💥", points: 7500 },
   { level: "15", name: "Immortal", emoji: "🌟", points: 9000 },
 ];
+
+// --- Styles for each badge color glow ---
+const badgeGlows = {
+  Beginner: keyframes`
+    0% { box-shadow: 0 0 5px #dc8839, 0 0 10px rgba(220, 136, 57, 0.5); }
+    50% { box-shadow: 0 0 15px #dc8839, 0 0 20px rgba(220, 136, 57, 0.8); }
+    100% { box-shadow: 0 0 5px #dc8839, 0 0 10px rgba(220, 136, 57, 0.5); }
+  `,
+  Novice: keyframes`
+    0% { box-shadow: 0 0 5px #4caf50, 0 0 10px rgba(76, 175, 80, 0.5); }
+    50% { box-shadow: 0 0 15px #4caf50, 0 0 20px rgba(76, 175, 80, 0.8); }
+    100% { box-shadow: 0 0 5px #4caf50, 0 0 10px rgba(76, 175, 80, 0.5); }
+  `,
+  Apprentice: keyframes`
+    0% { box-shadow: 0 0 5px #2196f3, 0 0 10px rgba(33, 150, 243, 0.5); }
+    50% { box-shadow: 0 0 15px #2196f3, 0 0 20px rgba(33, 150, 243, 0.8); }
+    100% { box-shadow: 0 0 5px #2196f3, 0 0 10px rgba(33, 150, 243, 0.5); }
+  `,
+  Journeyman: keyframes`
+    0% { box-shadow: 0 0 5px #ff9800, 0 0 10px rgba(255, 152, 0, 0.5); }
+    50% { box-shadow: 0 0 15px #ff9800, 0 0 20px rgba(255, 152, 0, 0.8); }
+    100% { box-shadow: 0 0 5px #ff9800, 0 0 10px rgba(255, 152, 0, 0.5); }
+  `,
+  Expert: keyframes`
+    0% { box-shadow: 0 0 5px #e91e63, 0 0 10px rgba(233, 30, 99, 0.5); }
+    50% { box-shadow: 0 0 15px #e91e63, 0 0 20px rgba(233, 30, 99, 0.8); }
+    100% { box-shadow: 0 0 5px #e91e63, 0 0 10px rgba(233, 30, 99, 0.5); }
+  `,
+  Master: keyframes`
+    0% { box-shadow: 0 0 5px #a81bd7, 0 0 10px rgba(168, 27, 215, 0.5); }
+    50% { box-shadow: 0 0 15px #a81bd7, 0 0 20px rgba(168, 27, 215, 0.8); }
+    100% { box-shadow: 0 0 5px #a81bd7, 0 0 10px rgba(168, 27, 215, 0.5); }
+  `,
+  Champion: keyframes`
+    0% { box-shadow: 0 0 5px #009688, 0 0 10px rgba(0, 150, 136, 0.5); }
+    50% { box-shadow: 0 0 15px #009688, 0 0 20px rgba(0, 150, 136, 0.8); }
+    100% { box-shadow: 0 0 5px #009688, 0 0 10px rgba(0, 150, 136, 0.5); }
+  `,
+  Hero: keyframes`
+    0% { box-shadow: 0 0 5px #ff5722, 0 0 10px rgba(255, 87, 34, 0.5); }
+    50% { box-shadow: 0 0 15px #ff5722, 0 0 20px rgba(255, 87, 34, 0.8); }
+    100% { box-shadow: 0 0 5px #ff5722, 0 0 10px rgba(255, 87, 34, 0.5); }
+  `,
+  Legend: keyframes`
+    0% { box-shadow: 0 0 5px #795548, 0 0 10px rgba(121, 85, 72, 0.5); }
+    50% { box-shadow: 0 0 15px #795548, 0 0 20px rgba(121, 85, 72, 0.8); }
+    100% { box-shadow: 0 0 5px #795548, 0 0 10px rgba(121, 85, 72, 0.5); }
+  `,
+  Mythic: keyframes`
+    0% { box-shadow: 0 0 5px #607d8b, 0 0 10px rgba(96, 125, 139, 0.5); }
+    50% { box-shadow: 0 0 15px #607d8b, 0 0 20px rgba(96, 125, 139, 0.8); }
+    100% { box-shadow: 0 0 5px #607d8b, 0 0 10px rgba(96, 125, 139, 0.5); }
+  `,
+  Guardian: keyframes`
+    0% { box-shadow: 0 0 5px #3f51b5, 0 0 10px rgba(63, 81, 181, 0.5); }
+    50% { box-shadow: 0 0 15px #3f51b5, 0 0 20px rgba(63, 81, 181, 0.8); }
+    100% { box-shadow: 0 0 5px #3f51b5, 0 0 10px rgba(63, 81, 181, 0.5); }
+  `,
+  Pioneer: keyframes`
+    0% { box-shadow: 0 0 5px #00bcd4, 0 0 10px rgba(0, 188, 212, 0.5); }
+    50% { box-shadow: 0 0 15px #00bcd4, 0 0 20px rgba(0, 188, 212, 0.8); }
+    100% { box-shadow: 0 0 5px #00bcd4, 0 0 10px rgba(0, 188, 212, 0.5); }
+  `,
+  Vanguard: keyframes`
+    0% { box-shadow: 0 0 5px #ff0707, 0 0 10px rgba(255, 7, 7, 0.5); }
+    50% { box-shadow: 0 0 15px #ff0707, 0 0 20px rgba(255, 7, 7, 0.8); }
+    100% { box-shadow: 0 0 5px #ff0707, 0 0 10px rgba(255, 7, 7, 0.5); }
+  `,
+  Trailblazer: keyframes`
+    0% { box-shadow: 0 0 5px #8bc34a, 0 0 10px rgba(139, 195, 74, 0.5); }
+    50% { box-shadow: 0 0 15px #8bc34a, 0 0 20px rgba(139, 195, 74, 0.8); }
+    100% { box-shadow: 0 0 5px #8bc34a, 0 0 10px rgba(139, 195, 74, 0.5); }
+  `,
+  Overlord: keyframes`
+    0% { box-shadow: 0 0 5px #f44336, 0 0 10px rgba(244, 67, 54, 0.5); }
+    50% { box-shadow: 0 0 15px #f44336, 0 0 20px rgba(244, 67, 54, 0.8); }
+    100% { box-shadow: 0 0 5px #f44336, 0 0 10px rgba(244, 67, 54, 0.5); }
+  `,
+  Immortal: keyframes`
+    0% { box-shadow: 0 0 5px #673ab7, 0 0 10px rgba(103, 58, 183, 0.5); }
+    50% { box-shadow: 0 0 15px #673ab7, 0 0 20px rgba(103, 58, 183, 0.8); }
+    100% { box-shadow: 0 0 5px #673ab7, 0 0 10px rgba(103, 58, 183, 0.5); }
+  `,
+};
+
+// --- Glow effect animation ---
+const glow = keyframes`
+  0% { 
+    box-shadow: 0 0 5px rgba(127, 0, 255, 0.5), 0 0 10px rgba(225, 0, 255, 0.3);
+    scale : 1.03;
+  }
+  50% { box-shadow: 0 0 15px rgba(127, 0, 255, 0.8), 0 0 20px rgba(225, 0, 255, 0.5); 
+    scale : 1;
+  }
+  100% { box-shadow: 0 0 5px rgba(127, 0, 255, 0.5), 0 0 10px rgba(225, 0, 255, 0.3); 
+    scale : 1.03;
+  }
+`;
+
+const purpleGlow = keyframes`
+0% { 
+  box-shadow: 0 0 8px #a81bd7, 0 0 12px rgba(168, 27, 215, 0.5); 
+  /* scale : 1; */
+}
+50% { 
+  box-shadow: 0 0 16px #a81bd7, 0 0 20px rgba(168, 27, 215, 0.8); 
+  /* scale: 1.01; */
+}
+100% { 
+  box-shadow: 0 0 8px #a81bd7, 0 0 12px rgba(168, 27, 215, 0.5); 
+  /* scale: 1; */
+  }
+`;
+
+const glowOneColor = keyframes`
+0%{
+  box-shadow: 0 0 15px 2px #5f00d9;
+}
+50%{box-shadow : 0 0 15px 2px #9266cb86}
+100%{
+  box-shadow: 0 0 15px 2px #5f00d9;
+}
+`;
 
 // --- Existing & New Styles ---
 const StyledContainer = styled.div`
@@ -150,11 +275,21 @@ const Card = styled.div`
   border: 1px solid rgba(255, 255, 255, 0.3);
   position: relative;
   transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  animation: ${({ $isCurrentMilestone }) =>
+    $isCurrentMilestone &&
+    css`
+      ${purpleGlow} 2s infinite ease-in-out
+    `};
 
   &:hover {
     transform: translateY(-10px) scale(1.03);
     box-shadow: 0 16px 30px rgba(0, 0, 0, 0.15);
     z-index: 10;
+    animation: ${({ $milestoneName }) =>
+      $milestoneName &&
+      css`
+        ${badgeGlows[$milestoneName]} 1.5s infinite alternate ease-in-out;
+      `};
     cursor: pointer;
   }
 `;
@@ -200,6 +335,33 @@ const CardPoints = styled.div`
 
 // --- The Main Component ---
 const Milestones = () => {
+  const [currentBadge, setCurrentBadge] = useState(null);
+
+  useEffect(() => {
+    async function getCurrentUser() {
+      try {
+        const res = await fetch("http://localhost:8000/currentUser", {
+          method: "GET",
+          headers: {
+            authorization: localStorage.getItem("token"),
+            "Content-Type": "application/json",
+          },
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+          console.log(data);
+          setCurrentBadge(data.currentUser.currentBadge);
+        }
+      } catch (err) {
+        toast.error(err.message || "Something went wrong!");
+      }
+    }
+
+    getCurrentUser();
+  }, []);
+
   return (
     <StyledContainer>
       <Title>🏆 Milestone Badges</Title>
@@ -211,7 +373,11 @@ const Milestones = () => {
 
       <CardGrid>
         {milestonesData.map((milestone) => (
-          <Card key={milestone.level}>
+          <Card
+            key={milestone.level}
+            $milestoneName={milestone.name}
+            $isCurrentMilestone={milestone.name === currentBadge}
+          >
             <CardHeader>
               <CardLevel>Level {milestone.level}</CardLevel>
             </CardHeader>

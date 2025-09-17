@@ -5,6 +5,7 @@ import { createGlobalStyle } from "styled-components";
 import { createBrowserRouter, Navigate, RouterProvider } from "react-router";
 import Home from "./pages/Home";
 import Transactions from "./pages/Transactions";
+import PlannerDashboard from "./pages/PlannerDashboard";
 import About from "./pages/About";
 import Support from "./pages/Support";
 // import Welcome from "./components/Welcome";
@@ -23,6 +24,9 @@ import Rank from "./pages/Rank";
 // import PomodoroTimer from "./pages/PomodoroTimer";
 import Milestones from "./components/Milestones";
 import Bg from "./pages/Bg";
+import Loader2 from "./components/Loader2";
+
+// import Home1 from "./pages/Home_1";
 
 // Password Reset Done
 /* <SuccessNotification
@@ -69,6 +73,7 @@ const GlobalStyle = createGlobalStyle`
       font-family: "Space Grotesk", sans-serif;
       position: relative;
   }
+
 `;
 
 const router = createBrowserRouter([
@@ -78,16 +83,19 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       { index: true, element: <Home /> },
+      { path: "planner-dashboard", element: <PlannerDashboard /> },
       { path: "sessiontable", element: <Transactions /> },
+      { path: "Projects", element: <Home /> },
       { path: "about", element: <About /> },
       { path: "support", element: <Support /> },
       { path: "profile", element: <Profile /> },
       { path: "settings", element: <div>coming soon...</div> },
       { path: "focusmode", element: <FocusMode /> },
       { path: "milestones", element: <Milestones /> },
-      { path: "rank", element: <Rank /> },
+      { path: "leaderboard", element: <Rank /> },
+      { path: "loader", element: <Loader2 /> },
       {
-        path: "/calender",
+        path: "/planner",
         element: <CalenderPage />,
       },
     ],
@@ -120,10 +128,17 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")).render(
   <>
-    <StrictMode>
-      <GlobalStyle />
-      <RouterProvider router={router} />
-      <Toaster />
-    </StrictMode>
+    {/* <StrictMode> */}
+    <Toaster
+      position="top-center"
+      toastOptions={{
+        style: {
+          zIndex: 99999999,
+        },
+      }}
+    />
+    <GlobalStyle />
+    <RouterProvider router={router} />
+    {/* </StrictMode> */}
   </>
 );
