@@ -180,11 +180,11 @@ const ManageInvalidSession = ({
           </Button>
           <Button
             onClick={() => {
-              if (!duration || +duration <= 0 || +duration > 250) {
-                return toast.error(
-                  "Duration must be less than equals to 250 mins"
-                );
-              }
+              // if (!duration || +duration <= 0 || +duration > 250) {
+              //   return toast.error(
+              //     "Duration must be less than equals to 250 mins"
+              //   );
+              // }
 
               handleSubmit({
                 sessionId: sessionInfo.sessionId,
