@@ -19,6 +19,7 @@ import {
 } from "date-fns";
 import AddEventModal from "../components/AddEventModal";
 import ShowCategoryModal from "../components/ShowCategoryModal";
+import Loader2 from "../components/Loader2";
 
 const localizer = momentLocalizer(moment);
 
@@ -283,32 +284,48 @@ const CalendarPage = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [showAddCategoryModal, setShowAddCategoryModal] = useState(false);
   const [isShowCategoryModalOpen, setIsShowCategoryModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchCategories = async () => {
-      // 1. extract token
-      const token = localStorage.getItem("token");
+      try {
+        setIsLoading(true);
 
-      // 2. Send the http request
-      const res = await fetch("http://localhost:8000/tasks/categories", {
-        headers: {
-          authorization: token,
-          "Content-Type": "application/json",
-        },
-      });
+        // 1. extract token
+        const token = localStorage.getItem("token");
 
-      const data = await res.json();
+        // 2. Send the http request
+        const res = await fetch("http://localhost:8000/tasks/categories", {
+          headers: {
+            authorization: token,
+            "Content-Type": "application/json",
+          },
+        });
 
-      setCategories(data.categories);
+        const data = await res.json();
+
+        setCategories(data.categories);
+      } catch (err) {
+        toast.error(err.message);
+      } finally {
+        setIsLoading(false);
+      }
     };
 
     fetchCategories();
   }, []);
 
   useEffect(() => {
-    const { start, end } = getRangeDates(currentView, currentDate);
+    try {
+      setIsLoading(true);
+      const { start, end } = getRangeDates(currentView, currentDate);
 
-    fetchTasks(start, end);
+      fetchTasks(start, end);
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
   const getRangeDates = (view, date) => {
@@ -580,107 +597,115 @@ const CalendarPage = () => {
 
   return (
     <>
-      <Wrapper>
-        <Heading>Vibrant Task Planner</Heading>
+      {isLoading ? (
+        <Loader2 label="Preparing your calender..." />
+      ) : (
+        <>
+          <Wrapper>
+            <Heading>Vibrant Task Planner</Heading>
 
-        {/* Calendar with drag-select */}
-        <DnDCalendar
-          localizer={localizer}
-          events={events}
-          onEventDrop={handleEventDrop}
-          onEventResize={handleEventResize}
-          resizable
-          startAccessor="start"
-          endAccessor="end"
-          selectable
-          onSelectSlot={handleSelectSlot}
-          onSelectEvent={handleSelectEvent}
-          longPressThreshold={10} // Optional: for mobile (ms)
-          // onSelecting={handleSelecting}
-          scrollToTime={new Date(2025, 0, 1, 8, 0)} // scrolls to 8 AM initially
-          defaultView="month"
-          onRangeChange={(range, view) => {
-            const { start, end } = normalizeInputDates(range);
+            {/* Calendar with drag-select */}
+            <DnDCalendar
+              localizer={localizer}
+              events={events}
+              onEventDrop={handleEventDrop}
+              onEventResize={handleEventResize}
+              resizable
+              startAccessor="start"
+              endAccessor="end"
+              selectable
+              onSelectSlot={handleSelectSlot}
+              onSelectEvent={handleSelectEvent}
+              longPressThreshold={10} // Optional: for mobile (ms)
+              // onSelecting={handleSelecting}
+              scrollToTime={new Date(2025, 0, 1, 8, 0)} // scrolls to 8 AM initially
+              defaultView="month"
+              onRangeChange={(range, view) => {
+                const { start, end } = normalizeInputDates(range);
 
-            fetchTasks(start, end);
-          }} // 👈 important
-          views={["month", "week", "day", "agenda"]}
-          view={currentView}
-          popup
-          onView={(view) => setCurrentView(view)}
-          date={currentDate}
-          onNavigate={(date) => setCurrentDate(date)}
-          eventPropGetter={(event) => ({
-            style: {
-              backgroundColor: event.color || "#5834dbff", // fallback
-              color: "white",
-              borderRadius: "6px",
-              padding: "2px 6px",
-              marginRight: "4px",
+                fetchTasks(start, end);
+              }} // 👈 important
+              views={["month", "week", "day", "agenda"]}
+              view={currentView}
+              popup
+              onView={(view) => setCurrentView(view)}
+              date={currentDate}
+              onNavigate={(date) => setCurrentDate(date)}
+              eventPropGetter={(event) => ({
+                style: {
+                  backgroundColor: event.color || "#5834dbff", // fallback
+                  color: "white",
+                  borderRadius: "6px",
+                  padding: "2px 6px",
+                  marginRight: "4px",
 
-              // for hiding the content if overflown
-              overflow: "hidden", // Content jo box se bahar jaye, use hide karega
-              whiteSpace: "nowrap", // Text ko ek hi line mein rakhega
-              textOverflow: "ellipsis",
-            },
-          })}
-          // tooltipAccessor="description"
-          tooltipAccessor={(event) => {
-            if (currentView === "month") {
-              return event.description
-                ? `${moment(event.start).format("h:mm A")} - ${moment(
-                    event.end
-                  ).format("h:mm A")} ${event.description}`
-                : `${moment(event.start).format("h:mm A")} - ${moment(
-                    event.end
-                  ).format("h:mm A")} ${event.title}`;
-            } else {
-              return event.description ? event.description : event.title;
-            }
-          }}
-        />
-      </Wrapper>
+                  // for hiding the content if overflown
+                  overflow: "hidden", // Content jo box se bahar jaye, use hide karega
+                  whiteSpace: "nowrap", // Text ko ek hi line mein rakhega
+                  textOverflow: "ellipsis",
+                },
+              })}
+              // tooltipAccessor="description"
+              tooltipAccessor={(event) => {
+                if (currentView === "month") {
+                  return event.description
+                    ? `${moment(event.start).format("h:mm A")} - ${moment(
+                        event.end
+                      ).format("h:mm A")} ${event.description}`
+                    : `${moment(event.start).format("h:mm A")} - ${moment(
+                        event.end
+                      ).format("h:mm A")} ${event.title}`;
+                } else {
+                  return event.description ? event.description : event.title;
+                }
+              }}
+            />
+          </Wrapper>
 
-      {isEditModalOpen && selectedEvent && (
-        <EditEventModal
-          event={selectedEvent}
-          onClose={() => setIsEditModalOpen(false)}
-          categories={categories}
-          setCategories={setCategories}
-          showAddCategoryModal={showAddCategoryModal}
-          setShowAddCategoryModal={setShowAddCategoryModal}
-          onSave={handleEditTask}
-          onDelete={handleDeleteTask}
-        />
-      )}
+          {isEditModalOpen && selectedEvent && (
+            <EditEventModal
+              event={selectedEvent}
+              onClose={() => setIsEditModalOpen(false)}
+              categories={categories}
+              setCategories={setCategories}
+              showAddCategoryModal={showAddCategoryModal}
+              setShowAddCategoryModal={setShowAddCategoryModal}
+              onSave={handleEditTask}
+              onDelete={handleDeleteTask}
+            />
+          )}
 
-      <FloatingButton onClick={() => setIsAddModalOpen(true)}>+</FloatingButton>
+          <FloatingButton onClick={() => setIsAddModalOpen(true)}>
+            +
+          </FloatingButton>
 
-      <CategoriesButton onClick={() => setIsShowCategoryModalOpen(true)}>
-        <BiCategoryAlt />
-      </CategoriesButton>
+          <CategoriesButton onClick={() => setIsShowCategoryModalOpen(true)}>
+            <BiCategoryAlt />
+          </CategoriesButton>
 
-      {isAddModalOpen && (
-        <AddEventModal
-          formData={formData}
-          setFormData={setFormData}
-          setIsAddModalOpen={setIsAddModalOpen}
-          handleAddTask={handleAddTask}
-          categories={categories}
-          setCategories={setCategories}
-          showAddCategoryModal={showAddCategoryModal}
-          setShowAddCategoryModal={setShowAddCategoryModal}
-        />
-      )}
+          {isAddModalOpen && (
+            <AddEventModal
+              formData={formData}
+              setFormData={setFormData}
+              setIsAddModalOpen={setIsAddModalOpen}
+              handleAddTask={handleAddTask}
+              categories={categories}
+              setCategories={setCategories}
+              showAddCategoryModal={showAddCategoryModal}
+              setShowAddCategoryModal={setShowAddCategoryModal}
+            />
+          )}
 
-      {isShowCategoryModalOpen && (
-        <ShowCategoryModal
-          categories={categories}
-          setCategories={setCategories}
-          setIsShowCategoryModalOpen={setIsShowCategoryModalOpen}
-          showAddCategoryModal={showAddCategoryModal}
-          setShowAddCategoryModal={setShowAddCategoryModal}
-        />
+          {isShowCategoryModalOpen && (
+            <ShowCategoryModal
+              categories={categories}
+              setCategories={setCategories}
+              setIsShowCategoryModalOpen={setIsShowCategoryModalOpen}
+              showAddCategoryModal={showAddCategoryModal}
+              setShowAddCategoryModal={setShowAddCategoryModal}
+            />
+          )}
+        </>
       )}
     </>
   );
