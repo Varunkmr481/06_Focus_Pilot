@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import { NavLink, useNavigate } from "react-router";
 import { IoLogOut, IoLogOutOutline, IoMoonOutline } from "react-icons/io5";
 import { MdDarkMode, MdLightMode, MdSupportAgent } from "react-icons/md";
 import { FaMoon } from "react-icons/fa";
 import toast from "react-hot-toast";
+import AvatarDropDown from "./AvatarDropDown";
 
 const AvatarWrapper = styled.div`
   position: relative;
@@ -31,30 +32,95 @@ const AvatarImage = styled.div`
   }
 `;
 
+// const AvatarDropDownMenu = styled.div`
+//   border: 2px solid black;
+//   position: absolute;
+//   right: 11%;
+//   top: 100%;
+//   z-index: 9999;
+// `;
+
+// const AvatarDropDownItem = styled(NavLink)`
+//   color: black;
+//   background-color: white;
+//   padding: 0.6rem 0.9rem;
+//   font-size: 1.2rem;
+//   font-weight: 600;
+//   display: flex;
+//   align-items: center;
+//   gap: 1rem;
+//   z-index: 999;
+//   text-decoration: none;
+
+//   &:hover {
+//     background-color: #5f00d9;
+//     color: white;
+//     cursor: pointer;
+//   }
+// `;
+
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
 const AvatarDropDownMenu = styled.div`
-  border: 2px solid black;
   position: absolute;
   right: 11%;
   top: 100%;
   z-index: 9999;
+  background-color: #ffffff;
+  border-radius: 0.75rem;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  border: 1px solid rgba(220, 220, 220, 0.5);
+  min-width: 15rem;
+  animation: ${fadeIn} 0.2s ease-out forwards;
 `;
 
 const AvatarDropDownItem = styled(NavLink)`
-  color: black;
-  background-color: white;
-  padding: 0.6rem 0.9rem;
-  font-size: 1.2rem;
-  font-weight: 600;
   display: flex;
   align-items: center;
   gap: 1rem;
-  z-index: 999;
   text-decoration: none;
+  color: #333;
+  padding: 0.8rem 1.2rem;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+  border-bottom: 1px solid #f0f0f0;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  svg {
+    font-size: 1.4rem;
+    color: #6c6c6c;
+    transition: all 0.2s ease-in-out;
+  }
 
   &:hover {
-    background-color: #5f00d9;
-    color: white;
+    background: linear-gradient(90deg, #f5e9ff 0%, rgba(255, 255, 255, 0) 100%);
+    color: #5f00d9;
     cursor: pointer;
+    font-weight: 600;
+
+    svg {
+      color: #5f00d9;
+    }
+  }
+
+  &.active {
+    background-color: #f5e9ff;
+    color: #5f00d9;
+    font-weight: 600;
   }
 `;
 
@@ -142,7 +208,10 @@ const UserDropDown = ({
 }) => {
   const [isAvatarClick, setIsAvatarClick] = useState(false);
   const avatarRef = useRef(null);
-  const [loggedInUser, setLoggedInUser] = useState("user");
+  const [loggedInUser, setLoggedInUser] = useState({
+    name: "user",
+    email: "user@gmail.com",
+  });
   const navigate = useNavigate();
   console.log("avatarMenuItems", avatarMenuItems);
 
@@ -161,13 +230,16 @@ const UserDropDown = ({
   }, []);
 
   useEffect(() => {
-    const loggedUser = localStorage.getItem("user");
-    // console.log(loggedUser);
+    const loggedUserName = localStorage.getItem("user");
+    const loggedUserEmail = localStorage.getItem("email");
 
-    if (loggedUser) {
-      setLoggedInUser(
-        loggedUser.charAt(0).toUpperCase() + loggedUser.slice(1).toLowerCase()
-      );
+    if (loggedUserName) {
+      setLoggedInUser({
+        name:
+          loggedUserName.charAt(0).toUpperCase() +
+          loggedUserName.slice(1).toLowerCase(),
+        email: loggedUserEmail,
+      });
     }
   }, []);
 
@@ -189,7 +261,7 @@ const UserDropDown = ({
     <AvatarWrapper>
       <ColumnFlexDiv>
         <AvatarInfo>
-          <AvatarName>{loggedInUser}</AvatarName>
+          <AvatarName>{loggedInUser.name}</AvatarName>
 
           <AvatarImage
             ref={avatarRef}
@@ -207,27 +279,33 @@ const UserDropDown = ({
 
         {/* <MdLightMode /> */}
       </ColumnFlexDiv>
-
       {/* <AvatarTriangle /> */}
       {isAvatarClick && (
-        <AvatarDropDownMenu>
-          {avatarMenuItems.map((menuItem, index) => {
-            return (
-              <AvatarDropDownItem
-                key={index}
-                to={menuItem?.to}
-                onClick={() => {
-                  menuItem.action();
-                  setHeaderText(menuItem.label);
-                }}
-              >
-                <span>{menuItem.icon}</span>
-                <span>{menuItem.label}</span>
-              </AvatarDropDownItem>
-            );
-          })}
-        </AvatarDropDownMenu>
+        <AvatarDropDown
+          setHeaderText={setHeaderText}
+          handleLogout={logout}
+          avatarMenuItems={avatarMenuItems}
+          loggedInUser={loggedInUser}
+        />
       )}
+
+      {/* <AvatarDropDownMenu>
+        {avatarMenuItems.map((menuItem, index) => {
+          return (
+            <AvatarDropDownItem
+              key={index}
+              to={menuItem?.to}
+              onClick={() => {
+                menuItem.action();
+                setHeaderText(menuItem.label);
+              }}
+            >
+              <span>{menuItem.icon}</span>
+              <span>{menuItem.label}</span>
+            </AvatarDropDownItem>
+          );
+        })}
+      </AvatarDropDownMenu>{" "} */}
     </AvatarWrapper>
   );
 };
