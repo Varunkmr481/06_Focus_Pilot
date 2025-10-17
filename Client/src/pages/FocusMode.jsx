@@ -5,6 +5,7 @@ import { IoMdWarning } from "react-icons/io";
 import { IoCloseCircle } from "react-icons/io5";
 import styled, { keyframes } from "styled-components";
 import { Badge } from "../components/Milestones";
+import Loader2 from "../components/Loader2";
 
 const pulse = keyframes`
   0% {
@@ -503,6 +504,7 @@ const FocusMode = () => {
   const [sessionIndex, setSessionIndex] = useState(0);
   const [sessions, setSessions] = useState([]);
   const [expectedTime, setExpectedTime] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
   const distractionsRef = useRef([]);
   const focusAudioRef = useRef(null);
   const breakAudioRef = useRef(null);
@@ -527,6 +529,7 @@ const FocusMode = () => {
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
+        setIsLoading(true);
         // 1. Extract token from localstorage
         const token = localStorage.getItem("token");
 
@@ -555,6 +558,8 @@ const FocusMode = () => {
         }
       } catch (err) {
         toast.error(err.message);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -956,336 +961,351 @@ const FocusMode = () => {
 
   return (
     <>
-      <FocusContainer
-        $isStartDialogEnable={isDialogEnable}
-        $isDistraction={isDistraction}
-        $isEndSession={isEndSession}
-      >
-        <FocusHeader>
-          <FocusStatBlock>
-            <FocusStatLabel>Session status : </FocusStatLabel>
-            <FocusStatValue>{isRunning ? "On" : "Off"}</FocusStatValue>
-          </FocusStatBlock>
-
-          <FocusStatBlock>
-            <FocusStatLabel>Sessions Done : </FocusStatLabel>
-            <FocusStatValue>{totalSessions}</FocusStatValue>
-          </FocusStatBlock>
-
-          <FocusStatBlock>
-            <FocusStatLabel>Current level : </FocusStatLabel>
-            <FocusStatValue>{posi.currentLevel}</FocusStatValue>
-          </FocusStatBlock>
-
-          <FocusStatBlock>
-            <FocusStatLabel>XP badge: </FocusStatLabel>
-            <FocusStatValue>
-              <Badge
-                className={posi.currentBadge ? posi.currentBadge : "default"}
-              >{`${posi.currentTrophy} ${posi.currentBadge}`}</Badge>
-            </FocusStatValue>
-          </FocusStatBlock>
-        </FocusHeader>
-
-        <FocusBody>
-          <FocusClock>
-            <ClockSvg viewBox="0 0 300 300" preserveAspectRatio="xMidYMid meet">
-              <ClockCircle
-                $currentPhase={currentPhase}
-                r={radius}
-                cx="150"
-                cy="150"
-                strokeDasharray={circumference} // 2πr
-                strokeDashoffset={dashoffset ? dashoffset : 0} // dynamic
-                style={{ transition: "stroke-dashoffset 1s linear" }}
-              />
-              <ClockText x={155} y={160} $timeLeft={timeLeft}>
-                {formatTime(timeLeft)}
-              </ClockText>
-              <ClockTask x={155} y={190}>
-                {sessionInfo.taskTitle}
-              </ClockTask>
-              <ClockTask x={155} y={210}>
-                {isRunning
-                  ? `Phase : ${currentPhase} (${sessionIndex + 1}/${
-                      sessions.length
-                    })`
-                  : "Start new Session"}
-              </ClockTask>
-            </ClockSvg>
-            {isRunning && (
-              <ClockQuote>💡 "Stay focused, you’re doing great!"</ClockQuote>
-            )}
-          </FocusClock>
-
-          <FocusBtnWrapper>
-            <FocusBtn
-              onClick={() => {
-                if (isRunning) {
-                  return toast.error(
-                    "Please stop current session to start new"
-                  );
-                }
-
-                setIsDialogEnable(true);
-              }}
-            >
-              {isRunning ? "In Progress.." : "Start Session"}
-            </FocusBtn>
-            <FocusBtn
-              onClick={() => {
-                if (!isRunning) {
-                  return toast.error(
-                    "Please start the session before performing this action."
-                  );
-                }
-
-                setIsEndSession(true);
-              }}
-            >
-              End Session
-            </FocusBtn>
-            <FocusMusicBtn
-              onClick={() => {
-                if (!isRunning) {
-                  return toast.error("Please start the session to start music");
-                }
-
-                setIsMusicEnabled((prev) => !prev);
-              }}
-            >
-              {!isMusicEnabled ? "Start Music" : "Pause Music"}
-            </FocusMusicBtn>
-
-            <FocusDistractBtn
-              onClick={() => {
-                if (!isRunning) {
-                  return toast.error(
-                    "Please start the session before performing this action."
-                  );
-                }
-
-                setIsDistraction(true);
-              }}
-            >
-              <span>
-                <IoMdWarning />
-              </span>
-              <span>Got Distraction ? </span>
-            </FocusDistractBtn>
-          </FocusBtnWrapper>
-        </FocusBody>
-      </FocusContainer>
-
-      <FormContainer $isDialogEnable={isDialogEnable}>
-        <FormCloseContainer>
-          <FormCloseBtn
-            onClick={() => {
-              setIsDialogEnable(false);
-            }}
+      {isLoading ? (
+        <Loader2 label="Preparing your focus clock..." />
+      ) : (
+        <>
+          <FocusContainer
+            $isStartDialogEnable={isDialogEnable}
+            $isDistraction={isDistraction}
+            $isEndSession={isEndSession}
           >
-            <CloseIcon />
-          </FormCloseBtn>
-        </FormCloseContainer>
+            <FocusHeader>
+              <FocusStatBlock>
+                <FocusStatLabel>Session status : </FocusStatLabel>
+                <FocusStatValue>{isRunning ? "On" : "Off"}</FocusStatValue>
+              </FocusStatBlock>
 
-        <StartSessionForm onSubmit={handleSessionStartForm}>
-          <FormField>
-            <FormLabel htmlFor="task">Task Title</FormLabel>
-            <FormInput
-              type="text"
-              id="task"
-              value={sessionInfo.taskTitle}
-              onChange={(e) => {
-                // setTaskTitle(e.target.value);
-                setSessionInfo((prev) => {
-                  return { ...prev, taskTitle: e.target.value };
-                });
-              }}
-            />
-          </FormField>
+              <FocusStatBlock>
+                <FocusStatLabel>Sessions Done : </FocusStatLabel>
+                <FocusStatValue>{totalSessions}</FocusStatValue>
+              </FocusStatBlock>
 
-          <FormField>
-            <FormLabel htmlFor="duration">Session Duration</FormLabel>
-            <FormSelect
-              type="text"
-              id="duration"
-              value={totalTime}
-              onChange={(e) => {
-                setTotalTime(e.target.value);
-              }}
-            >
-              <option value="default">Select Session Duration</option>
-              <option value={2}>2 min</option>
-              <option value={50}>50 min</option>
-              <option value={100}>100 min</option>
-              <option value={150}>150 min</option>
-              <option value={200}>200 min</option>
-              <option value={250}>250 min</option>
-            </FormSelect>
-          </FormField>
+              <FocusStatBlock>
+                <FocusStatLabel>Current level : </FocusStatLabel>
+                <FocusStatValue>{posi.currentLevel}</FocusStatValue>
+              </FocusStatBlock>
 
-          <FormField>
-            <FormLabel htmlFor="break">Break Duration</FormLabel>
-            <FormSelect
-              id="break"
-              value={breakLength}
-              onChange={(e) => {
-                setBreakLength(e.target.value);
-              }}
-            >
-              <option value="default">Select Break Duration</option>
-              <option value="1">1 min</option>
-              <option value="5">5 min</option>
-              <option value="10">10 min</option>
-            </FormSelect>
-          </FormField>
+              <FocusStatBlock>
+                <FocusStatLabel>XP badge: </FocusStatLabel>
+                <FocusStatValue>
+                  <Badge
+                    className={
+                      posi.currentBadge ? posi.currentBadge : "default"
+                    }
+                  >{`${posi.currentTrophy} ${posi.currentBadge}`}</Badge>
+                </FocusStatValue>
+              </FocusStatBlock>
+            </FocusHeader>
 
-          <FormField>
-            <FormLabel htmlFor="goal">Goal for Session</FormLabel>
-            <FormSelect
-              id="goal"
-              value={sessionInfo.sessionGoal}
-              onChange={(e) => {
-                // setSessionGoal(e.target.value);
-                setSessionInfo((prev) => {
-                  return { ...prev, sessionGoal: e.target.value };
-                });
-              }}
-            >
-              <option value="default">Select Session Goal</option>
-              <optgroup label="Focused Work">
-                <option value="Deep work">Deep work</option>
-                <option value="Light task">Light task</option>
-                <option value="Creative task">Creative task</option>
-              </optgroup>
+            <FocusBody>
+              <FocusClock>
+                <ClockSvg
+                  viewBox="0 0 300 300"
+                  preserveAspectRatio="xMidYMid meet"
+                >
+                  <ClockCircle
+                    $currentPhase={currentPhase}
+                    r={radius}
+                    cx="150"
+                    cy="150"
+                    strokeDasharray={circumference} // 2πr
+                    strokeDashoffset={dashoffset ? dashoffset : 0} // dynamic
+                    style={{ transition: "stroke-dashoffset 1s linear" }}
+                  />
+                  <ClockText x={155} y={160} $timeLeft={timeLeft}>
+                    {formatTime(timeLeft)}
+                  </ClockText>
+                  <ClockTask x={155} y={190}>
+                    {sessionInfo.taskTitle}
+                  </ClockTask>
+                  <ClockTask x={155} y={210}>
+                    {isRunning
+                      ? `Phase : ${currentPhase} (${sessionIndex + 1}/${
+                          sessions.length
+                        })`
+                      : "Start new Session"}
+                  </ClockTask>
+                </ClockSvg>
+                {isRunning && (
+                  <ClockQuote>
+                    💡 "Stay focused, you’re doing great!"
+                  </ClockQuote>
+                )}
+              </FocusClock>
 
-              <optgroup label="Focused Learning">
-                <option value="Revision">Revision</option>
-                <option value="Concept Learning">Concept Learning</option>
-                <option value="Mock Test">Mock Test</option>
-              </optgroup>
-            </FormSelect>
-          </FormField>
+              <FocusBtnWrapper>
+                <FocusBtn
+                  onClick={() => {
+                    if (isRunning) {
+                      return toast.error(
+                        "Please stop current session to start new"
+                      );
+                    }
 
-          {/* <FormFieldCheckBox>
+                    setIsDialogEnable(true);
+                  }}
+                >
+                  {isRunning ? "In Progress.." : "Start Session"}
+                </FocusBtn>
+                <FocusBtn
+                  onClick={() => {
+                    if (!isRunning) {
+                      return toast.error(
+                        "Please start the session before performing this action."
+                      );
+                    }
+
+                    setIsEndSession(true);
+                  }}
+                >
+                  End Session
+                </FocusBtn>
+                <FocusMusicBtn
+                  onClick={() => {
+                    if (!isRunning) {
+                      return toast.error(
+                        "Please start the session to start music"
+                      );
+                    }
+
+                    setIsMusicEnabled((prev) => !prev);
+                  }}
+                >
+                  {!isMusicEnabled ? "Start Music" : "Pause Music"}
+                </FocusMusicBtn>
+
+                <FocusDistractBtn
+                  onClick={() => {
+                    if (!isRunning) {
+                      return toast.error(
+                        "Please start the session before performing this action."
+                      );
+                    }
+
+                    setIsDistraction(true);
+                  }}
+                >
+                  <span>
+                    <IoMdWarning />
+                  </span>
+                  <span>Got Distraction ? </span>
+                </FocusDistractBtn>
+              </FocusBtnWrapper>
+            </FocusBody>
+          </FocusContainer>
+
+          <FormContainer $isDialogEnable={isDialogEnable}>
+            <FormCloseContainer>
+              <FormCloseBtn
+                onClick={() => {
+                  setIsDialogEnable(false);
+                }}
+              >
+                <CloseIcon />
+              </FormCloseBtn>
+            </FormCloseContainer>
+
+            <StartSessionForm onSubmit={handleSessionStartForm}>
+              <FormField>
+                <FormLabel htmlFor="task">Task Title</FormLabel>
+                <FormInput
+                  type="text"
+                  id="task"
+                  value={sessionInfo.taskTitle}
+                  onChange={(e) => {
+                    // setTaskTitle(e.target.value);
+                    setSessionInfo((prev) => {
+                      return { ...prev, taskTitle: e.target.value };
+                    });
+                  }}
+                />
+              </FormField>
+
+              <FormField>
+                <FormLabel htmlFor="duration">Session Duration</FormLabel>
+                <FormSelect
+                  type="text"
+                  id="duration"
+                  value={totalTime}
+                  onChange={(e) => {
+                    setTotalTime(e.target.value);
+                  }}
+                >
+                  <option value="default">Select Session Duration</option>
+                  <option value={2}>2 min</option>
+                  <option value={50}>50 min</option>
+                  <option value={100}>100 min</option>
+                  <option value={150}>150 min</option>
+                  <option value={200}>200 min</option>
+                  <option value={250}>250 min</option>
+                </FormSelect>
+              </FormField>
+
+              <FormField>
+                <FormLabel htmlFor="break">Break Duration</FormLabel>
+                <FormSelect
+                  id="break"
+                  value={breakLength}
+                  onChange={(e) => {
+                    setBreakLength(e.target.value);
+                  }}
+                >
+                  <option value="default">Select Break Duration</option>
+                  <option value="1">1 min</option>
+                  <option value="5">5 min</option>
+                  <option value="10">10 min</option>
+                </FormSelect>
+              </FormField>
+
+              <FormField>
+                <FormLabel htmlFor="goal">Goal for Session</FormLabel>
+                <FormSelect
+                  id="goal"
+                  value={sessionInfo.sessionGoal}
+                  onChange={(e) => {
+                    // setSessionGoal(e.target.value);
+                    setSessionInfo((prev) => {
+                      return { ...prev, sessionGoal: e.target.value };
+                    });
+                  }}
+                >
+                  <option value="default">Select Session Goal</option>
+                  <optgroup label="Focused Work">
+                    <option value="Deep work">Deep work</option>
+                    <option value="Light task">Light task</option>
+                    <option value="Creative task">Creative task</option>
+                  </optgroup>
+
+                  <optgroup label="Focused Learning">
+                    <option value="Revision">Revision</option>
+                    <option value="Concept Learning">Concept Learning</option>
+                    <option value="Mock Test">Mock Test</option>
+                  </optgroup>
+                </FormSelect>
+              </FormField>
+
+              {/* <FormFieldCheckBox>
             <div className="check_wrapper">
               <label htmlFor="calm">Enable Calm Music?</label>
               <input type="checkbox" id="calm" />
             </div>
           </FormFieldCheckBox> */}
 
-          <SessionFormBtn type="Submit">Start Session</SessionFormBtn>
-        </StartSessionForm>
-      </FormContainer>
+              <SessionFormBtn type="Submit">Start Session</SessionFormBtn>
+            </StartSessionForm>
+          </FormContainer>
 
-      {/* DISTRACTION FORM */}
-      <NewFormContainer $isVisible={isDistraction}>
-        <FormCloseContainer>
-          <FormCloseBtn
-            onClick={() => {
-              setIsDistraction(false);
-            }}
-          >
-            <CloseIcon />
-          </FormCloseBtn>
-        </FormCloseContainer>
+          {/* DISTRACTION FORM */}
+          <NewFormContainer $isVisible={isDistraction}>
+            <FormCloseContainer>
+              <FormCloseBtn
+                onClick={() => {
+                  setIsDistraction(false);
+                }}
+              >
+                <CloseIcon />
+              </FormCloseBtn>
+            </FormCloseContainer>
 
-        <NewForm onSubmit={handleDistractionForm}>
-          <NewFormField>
-            <FormLabel htmlFor="distraction">
-              What Disrupted Your Focus? Describe the Distraction in detail
-              here.
-            </FormLabel>
-            <NewReasonArea
-              id="distraction"
-              rows={6}
-              value={sessionInfo.distractionInput}
-              onChange={(e) => {
-                // setDistractionInfo({ distraction: e.target.value });
-                setSessionInfo((prev) => {
-                  return { ...prev, distractionInput: e.target.value };
-                });
-              }}
-            />
-          </NewFormField>
+            <NewForm onSubmit={handleDistractionForm}>
+              <NewFormField>
+                <FormLabel htmlFor="distraction">
+                  What Disrupted Your Focus? Describe the Distraction in detail
+                  here.
+                </FormLabel>
+                <NewReasonArea
+                  id="distraction"
+                  rows={6}
+                  value={sessionInfo.distractionInput}
+                  onChange={(e) => {
+                    // setDistractionInfo({ distraction: e.target.value });
+                    setSessionInfo((prev) => {
+                      return { ...prev, distractionInput: e.target.value };
+                    });
+                  }}
+                />
+              </NewFormField>
 
-          <SessionFormBtn type="Submit">Done</SessionFormBtn>
-        </NewForm>
-      </NewFormContainer>
+              <SessionFormBtn type="Submit">Done</SessionFormBtn>
+            </NewForm>
+          </NewFormContainer>
 
-      {/* SESSION END */}
-      <EndSessionFormContainer $isVisible={isEndSession}>
-        <FormCloseContainer>
-          <FormCloseBtn
-            onClick={() => {
-              setIsEndSession(false);
-            }}
-          >
-            <CloseIcon />
-          </FormCloseBtn>
-        </FormCloseContainer>
+          {/* SESSION END */}
+          <EndSessionFormContainer $isVisible={isEndSession}>
+            <FormCloseContainer>
+              <FormCloseBtn
+                onClick={() => {
+                  setIsEndSession(false);
+                }}
+              >
+                <CloseIcon />
+              </FormCloseBtn>
+            </FormCloseContainer>
 
-        <EndSessionForm onSubmit={handleSessionEnd}>
-          <SessionFormField>
-            <FormLabel htmlFor="summary">Describe in detail : </FormLabel>
-            <EndSessionSummaryArea
-              id="summary"
-              rows={4}
-              value={sessionInfo.summary}
-              onChange={(e) => {
-                // setDistractionInfo({ distraction: e.target.value });
-                setSessionInfo((prev) => {
-                  return { ...prev, summary: e.target.value };
-                });
-              }}
-            />
-          </SessionFormField>
+            <EndSessionForm onSubmit={handleSessionEnd}>
+              <SessionFormField>
+                <FormLabel htmlFor="summary">Describe in detail : </FormLabel>
+                <EndSessionSummaryArea
+                  id="summary"
+                  rows={4}
+                  value={sessionInfo.summary}
+                  onChange={(e) => {
+                    // setDistractionInfo({ distraction: e.target.value });
+                    setSessionInfo((prev) => {
+                      return { ...prev, summary: e.target.value };
+                    });
+                  }}
+                />
+              </SessionFormField>
 
-          <SessionFormField>
-            <FormLabel>Reason for Ending Early :</FormLabel>
-            <FormSelect
-              value={sessionInfo.earlyEndReason}
-              onChange={(e) => {
-                setSessionInfo((prev) => {
-                  return { ...prev, earlyEndReason: e.target.value };
-                });
-              }}
-            >
-              <optgroup label="Valid Work Reasons">
-                <option value="Completed Task Early">
-                  ✅ Completed Task Early
-                </option>
-                <option value="Urgent Personal Work">
-                  🚨 Urgent Personal Work
-                </option>
-              </optgroup>
+              <SessionFormField>
+                <FormLabel>Reason for Ending Early :</FormLabel>
+                <FormSelect
+                  value={sessionInfo.earlyEndReason}
+                  onChange={(e) => {
+                    setSessionInfo((prev) => {
+                      return { ...prev, earlyEndReason: e.target.value };
+                    });
+                  }}
+                >
+                  <optgroup label="Valid Work Reasons">
+                    <option value="Completed Task Early">
+                      ✅ Completed Task Early
+                    </option>
+                    <option value="Urgent Personal Work">
+                      🚨 Urgent Personal Work
+                    </option>
+                  </optgroup>
 
-              <optgroup label="Focus Issues">
-                <option value="Lost Focus">
-                  🌀 Lost Focus / Couldn't concentrate
-                </option>
-                <option value="Got Distracted">
-                  📱 Got Distracted (Phone, Social Media, etc.)
-                </option>
-                <option value="Unexpected Call/Message">
-                  📞 Unexpected Call or Message
-                </option>
-              </optgroup>
+                  <optgroup label="Focus Issues">
+                    <option value="Lost Focus">
+                      🌀 Lost Focus / Couldn't concentrate
+                    </option>
+                    <option value="Got Distracted">
+                      📱 Got Distracted (Phone, Social Media, etc.)
+                    </option>
+                    <option value="Unexpected Call/Message">
+                      📞 Unexpected Call or Message
+                    </option>
+                  </optgroup>
 
-              <optgroup label="Health or Energy">
-                <option value="Low Energy">😴 Low Energy / Sleepy</option>
-                <option value="Health Issue">
-                  🤕 Felt Unwell / Health Issue
-                </option>
-              </optgroup>
+                  <optgroup label="Health or Energy">
+                    <option value="Low Energy">😴 Low Energy / Sleepy</option>
+                    <option value="Health Issue">
+                      🤕 Felt Unwell / Health Issue
+                    </option>
+                  </optgroup>
 
-              <option value="Other">❓ Other</option>
-            </FormSelect>
-          </SessionFormField>
+                  <option value="Other">❓ Other</option>
+                </FormSelect>
+              </SessionFormField>
 
-          <SessionFormBtn type="Submit">Done</SessionFormBtn>
-        </EndSessionForm>
-      </EndSessionFormContainer>
+              <SessionFormBtn type="Submit">Done</SessionFormBtn>
+            </EndSessionForm>
+          </EndSessionFormContainer>
+        </>
+      )}
     </>
   );
 };

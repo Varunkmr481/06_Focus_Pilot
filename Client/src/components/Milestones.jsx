@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import styled, { css, keyframes } from "styled-components";
+import Loader2 from "./Loader2";
 
 // --- Data Transformation (same as before) ---
 const milestonesData = [
@@ -336,10 +337,13 @@ const CardPoints = styled.div`
 // --- The Main Component ---
 const Milestones = () => {
   const [currentBadge, setCurrentBadge] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     async function getCurrentUser() {
       try {
+        setIsLoading(true);
+
         const res = await fetch("http://localhost:8000/currentUser", {
           method: "GET",
           headers: {
@@ -356,6 +360,8 @@ const Milestones = () => {
         }
       } catch (err) {
         toast.error(err.message || "Something went wrong!");
+      } finally {
+        setIsLoading(false);
       }
     }
 
@@ -363,31 +369,37 @@ const Milestones = () => {
   }, []);
 
   return (
-    <StyledContainer>
-      <Title>🏆 Milestone Badges</Title>
+    <>
+      {isLoading ? (
+        <Loader2 label="Preparing your milestones..." />
+      ) : (
+        <StyledContainer>
+          <Title>🏆 Milestone Badges</Title>
 
-      <Subtext>
-        Points are awarded based on total <strong>focus hours</strong>{" "}
-        accumulated.
-      </Subtext>
+          <Subtext>
+            Points are awarded based on total <strong>focus hours</strong>{" "}
+            accumulated.
+          </Subtext>
 
-      <CardGrid>
-        {milestonesData.map((milestone) => (
-          <Card
-            key={milestone.level}
-            $milestoneName={milestone.name}
-            $isCurrentMilestone={milestone.name === currentBadge}
-          >
-            <CardHeader>
-              <CardLevel>Level {milestone.level}</CardLevel>
-            </CardHeader>
-            <CardEmoji>{milestone.emoji}</CardEmoji>
-            <Badge className={milestone.name}>{milestone.name}</Badge>
-            <CardPoints>{milestone.points} pts</CardPoints>
-          </Card>
-        ))}
-      </CardGrid>
-    </StyledContainer>
+          <CardGrid>
+            {milestonesData.map((milestone) => (
+              <Card
+                key={milestone.level}
+                $milestoneName={milestone.name}
+                $isCurrentMilestone={milestone.name === currentBadge}
+              >
+                <CardHeader>
+                  <CardLevel>Level {milestone.level}</CardLevel>
+                </CardHeader>
+                <CardEmoji>{milestone.emoji}</CardEmoji>
+                <Badge className={milestone.name}>{milestone.name}</Badge>
+                <CardPoints>{milestone.points} pts</CardPoints>
+              </Card>
+            ))}
+          </CardGrid>
+        </StyledContainer>
+      )}
+    </>
   );
 };
 
