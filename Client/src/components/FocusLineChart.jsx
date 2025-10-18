@@ -17,6 +17,7 @@ import getPreviousMonthFocusData from "../utils/getPreviousMonthFocusData";
 import getThisYearFocusData from "../utils/getThisYearFocusData";
 import getTodayFocusData from "../utils/getTodayFocusData";
 import getYesterdayFocusData from "../utils/getYesterdayFocusData";
+import Message from "./Message";
 
 // Sample Data
 const sampleData = [
@@ -137,13 +138,19 @@ const FocusLineChart = ({ sessionData, activeFilter }) => {
       <StyledH2>Focus Time</StyledH2>
       {/* <StyledH2>{`${focusPercentageChange.sign} ${focusPercentageChange.value}`}</StyledH2> */}
 
-      <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={lineChartData} margin={{ top: 30 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-          <XAxis dataKey={getLabelLineChart(activeFilter)} stroke="#6b7280" />
-          <YAxis stroke="#6b7280" />
-          <Tooltip content={<CustomTooltip />} />
-          {/* <Legend
+      {sessionData.length === 0 ? (
+        <Message status="error">
+          <span>No sessions found.</span>
+          <span>Please try adjusting your search filters.</span>
+        </Message>
+      ) : (
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={lineChartData} margin={{ top: 30 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+            <XAxis dataKey={getLabelLineChart(activeFilter)} stroke="#6b7280" />
+            <YAxis stroke="#6b7280" />
+            <Tooltip content={<CustomTooltip />} />
+            {/* <Legend
             // iconType="circle"
             verticalAlign="top"
             height={36}
@@ -153,16 +160,17 @@ const FocusLineChart = ({ sessionData, activeFilter }) => {
               paddingBottom: "6px",
             }}
           /> */}
-          <Line
-            type="monotone"
-            dataKey="focusTime"
-            stroke="#4f46e5"
-            strokeWidth={2.5}
-            dot={{ r: 4, stroke: "#4f46e5", strokeWidth: 2, fill: "#fff" }}
-            activeDot={{ r: 6 }}
-          />
-        </LineChart>
-      </ResponsiveContainer>
+            <Line
+              type="monotone"
+              dataKey="focusTime"
+              stroke="#4f46e5"
+              strokeWidth={2.5}
+              dot={{ r: 4, stroke: "#4f46e5", strokeWidth: 2, fill: "#fff" }}
+              activeDot={{ r: 6 }}
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      )}
     </ChartWrapper>
   );
 };

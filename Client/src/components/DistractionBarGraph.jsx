@@ -17,6 +17,7 @@ import getPreviousMonthDistractions from "../utils/getPreviousMonthDistractions"
 import getTodaysDistraction from "../utils/getTodaysDistraction";
 import getYearlyMonthlyDistractions from "../utils/getYearlyMonthlyDistractions";
 import getYesterdaysDistraction from "../utils/getYesterdaysDistraction";
+import Message from "./Message";
 
 // const data = [
 //   { label: "Mon", distractions: 2 },
@@ -325,50 +326,57 @@ const DistractionBarGraph = ({
     <ChartWrapper>
       <StyledH2>Distractions</StyledH2>
 
-      <ResponsiveContainer width="100%" height="100%">
-        <BarChart
-          data={distractionData}
-          margin={{ top: 40, right: 30, left: 10, bottom: 10 }}
-        >
-          <CartesianGrid strokeDasharray="4 4" stroke="#e5e7eb" />
+      {sessionData.length === 0 ? (
+        <Message status="error">
+          <span>No sessions found.</span>
+          <span>Please try adjusting your search filters.</span>
+        </Message>
+      ) : (
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart
+            data={distractionData}
+            margin={{ top: 40, right: 30, left: 10, bottom: 10 }}
+          >
+            <CartesianGrid strokeDasharray="4 4" stroke="#e5e7eb" />
 
-          <XAxis
-            dataKey="label"
-            tick={{ fontSize: 12, fill: "#6b7280" }} // Tailwind's gray-500
-            axisLine={{ stroke: "#d1d5db" }} // gray-300
-            tickLine={false}
-          />
-          <YAxis
-            tick={{ fontSize: 12, fill: "#6b7280" }}
-            axisLine={{ stroke: "#d1d5db" }}
-            tickLine={false}
-          />
+            <XAxis
+              dataKey="label"
+              tick={{ fontSize: 12, fill: "#6b7280" }} // Tailwind's gray-500
+              axisLine={{ stroke: "#d1d5db" }} // gray-300
+              tickLine={false}
+            />
+            <YAxis
+              tick={{ fontSize: 12, fill: "#6b7280" }}
+              axisLine={{ stroke: "#d1d5db" }}
+              tickLine={false}
+            />
 
-          <Tooltip
-            content={(props) => <CustomTooltip {...props} />}
-            cursor={{ fill: "rgba(147, 197, 253, 0.1)" }}
-          />
+            <Tooltip
+              content={(props) => <CustomTooltip {...props} />}
+              cursor={{ fill: "rgba(147, 197, 253, 0.1)" }}
+            />
 
-          <Legend
-            iconType="circle"
-            verticalAlign="top"
-            height={36}
-            wrapperStyle={{
-              fontSize: 13,
-              color: "#6b7280", // gray-500
-              paddingTop: "4px",
-            }}
-          />
+            <Legend
+              iconType="circle"
+              verticalAlign="top"
+              height={36}
+              wrapperStyle={{
+                fontSize: 13,
+                color: "#6b7280", // gray-500
+                paddingTop: "4px",
+              }}
+            />
 
-          <Bar
-            dataKey="distractions"
-            fill="#8b5cf6" // Tailwind's violet-500
-            radius={[6, 6, 0, 0]}
-            barSize={28}
-            name="distractions"
-          />
-        </BarChart>
-      </ResponsiveContainer>
+            <Bar
+              dataKey="distractions"
+              fill="#8b5cf6" // Tailwind's violet-500
+              radius={[6, 6, 0, 0]}
+              barSize={28}
+              name="distractions"
+            />
+          </BarChart>
+        </ResponsiveContainer>
+      )}
     </ChartWrapper>
   );
 };

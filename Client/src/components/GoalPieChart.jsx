@@ -21,6 +21,8 @@ const COLORS = [
 ];
 
 import styled from "styled-components";
+import ErrorMessage from "./Message";
+import Message from "./Message";
 // import filterSessionWithRange from "../utils/filterSessionWithRange";
 
 const ChartWrapper = styled.div`
@@ -226,14 +228,6 @@ const Rough = styled.div`
   }
 `;
 
-const NoSessionFound = styled.div`
-  text-align: center;
-  padding: 2rem;
-  color: red;
-  font-weight: 600;
-  font-style: italic;
-`;
-
 const GoalPieChart = ({ sessionData, setSessionData }) => {
   const [legendWidth, setLegendWidth] = useState(160);
   const [goalData, setGoalData] = useState([]);
@@ -283,9 +277,10 @@ const GoalPieChart = ({ sessionData, setSessionData }) => {
   return (
     <ChartWrapper>
       {sessionData.length === 0 ? (
-        <NoSessionFound>
-          No sessions found. Try adjusting your filters.
-        </NoSessionFound>
+        <Message status="error">
+          <span>No sessions found.</span>
+          <span>Please try adjusting your search filters.</span>
+        </Message>
       ) : (
         <ResponsiveContainer width="100%" height="100%">
           <PieChart margin={{ right: 10, left: 10 }}>
