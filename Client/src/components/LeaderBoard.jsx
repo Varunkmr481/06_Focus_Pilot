@@ -1,4 +1,8 @@
-import styled from "styled-components";
+import { useEffect, useRef, useState } from "react";
+import toast from "react-hot-toast";
+import styled, { css, keyframes } from "styled-components";
+import MyRankDetailsBox from "./MyRankDetailsBox";
+import Loader2 from "./Loader2";
 
 const Container = styled.div`
   /* max-width: 900px; */
@@ -42,7 +46,7 @@ const Subtext = styled.p`
 
 const Table = styled.table`
   width: 100%;
-  margin: 0 auto;
+  margin: 0 auto 1rem auto;
   border-collapse: collapse;
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(8px);
@@ -78,57 +82,169 @@ const Td = styled.td`
   color: #000000ff;
 `;
 
+const blink = keyframes`
+0%{
+  border-color: rgba(95, 0, 217, 1);
+}
+50%{
+   border-color: rgba(95, 0, 217, 0.2);
+}
+100% {
+    border-color: rgba(95, 0, 217, 1);
+}
+`;
+
 const Tr = styled.tr`
   transition: background 0.2s ease-in-out;
-  background: ${({ rank }) =>
-    rank === 1
-      ? "rgba(255, 215, 0, 0.25)" // Gold
-      : rank === 2
-      ? "rgba(192, 192, 192, 0.25)" // Silver
-      : rank === 3
-      ? "rgba(205, 127, 50, 0.25)" // Bronze
-      : "transparent"};
+  background: ${({ $rank }) => {
+    if ($rank === 1) {
+      return "rgba(255, 215, 0, 0.25)";
+    }
+
+    if ($rank === 2) {
+      return "rgba(192, 192, 192, 0.25)";
+    }
+
+    if ($rank === 3) {
+      return "rgba(205, 127, 50, 0.25)";
+    }
+  }};
+
+  /* Highlight the current user with a border and bolder text */
+  border: ${({ $isCurrentUser }) =>
+    $isCurrentUser ? "3px solid #5f00d9" : "none"};
+  font-weight: ${({ $isCurrentUser }) => ($isCurrentUser ? "bold" : "normal")};
+
+  ${({ $isCurrentUser }) =>
+    $isCurrentUser &&
+    css`
+      animation: ${blink} 2s infinite ease-in-out;
+    `}
 
   &:hover {
     background: rgba(255, 255, 255, 0.2);
   }
 `;
 
+const TableContainer = styled.div`
+  /* max-height: 50vh; */
+  /* position: relative; */
+  height: 58vh;
+  overflow-y: scroll;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+`;
+
+const LoadingText = styled.div`
+  text-align: center;
+  padding: 1rem;
+  color: #555;
+`;
+
 export default function Leaderboard({ users }) {
-  const sortedUsers = [...users].sort((a, b) => b.totalHours - a.totalHours);
+  const [myRankData, setMyRankData] = useState({});
+  const [topUsers, setTopUsers] = useState([]);
+  const [isCurrentUser, setIsCurrentUser] = useState(null);
+  const [isLoading, setLoading] = useState(false);
+
+  // Effect to fetch the main leaderboard data with infinite scrolling
+  useEffect(() => {
+    const fetchLeaderboardData = async () => {
+      setLoading(true);
+      const token = localStorage.getItem("token");
+
+      try {
+        const response = await fetch(
+          `http://localhost:8000/leaderboard?limit=10`,
+          {
+            method: "GET",
+            headers: {
+              authorization: token,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        const data = await response.json();
+
+        if (data.success) {
+          setMyRankData(() => {
+            return {
+              id: data.currUser._id,
+              rank: data.currUser.rank,
+              name: data.currUser.name,
+              badge: data.currUser.currentBadge,
+              trophy: data.currUser.currentTrophy,
+              focusHours: data.currUser.totalHours,
+            };
+          });
+          setTopUsers([...data.topUsers]);
+        }
+      } catch (err) {
+        toast.error(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLeaderboardData();
+  }, []);
 
   return (
-    <Container>
-      <Title>🏆 Focus Leaderboard</Title>
-      <Subtext>
-        Rankings are based on total <strong>focus hours</strong> earned by
-        users.
-      </Subtext>
+    <>
+      {isLoading ? (
+        <Loader2 label="Preparing leaderboard..." />
+      ) : (
+        <Container>
+          <Title>🏆 Top {topUsers?.length} Performers</Title>
 
-      <Table>
-        <Thead>
-          <Tr>
-            <Th>Rank</Th>
-            <Th>Name</Th>
-            <Th>Badge</Th>
-            <Th>Trophy</Th>
-            <Th>Focus Hours</Th>
-          </Tr>
-        </Thead>
+          <Subtext> </Subtext>
 
-        <tbody>
-          {sortedUsers.map((user, index) => (
-            <Tr key={user._id} rank={index + 1}>
-              <Td>#{index + 1}</Td>
-              <Td>{user.name}</Td>
-              <Td>{user.currentBadge}</Td>
-              <Td>{user.currentTrophy}</Td>
-              <Td>{user.totalHours.toFixed(2)} hrs</Td>
-            </Tr>
-          ))}
-        </tbody>
-      </Table>
-    </Container>
+          <TableContainer>
+            <Table>
+              <Thead>
+                <Tr>
+                  <Th>Rank</Th>
+                  <Th>Name</Th>
+                  <Th>Badge</Th>
+                  <Th>Trophy</Th>
+                  <Th>Focus Hours</Th>
+                </Tr>
+              </Thead>
+
+              <tbody>
+                {topUsers.map((user) => (
+                  <Tr
+                    key={user._id}
+                    $rank={user.rank}
+                    $isCurrentUser={user._id === myRankData.id}
+                  >
+                    <Td>#{user.rank}</Td>
+                    <Td>{user.name}</Td>
+                    <Td>{user.currentBadge}</Td>
+                    <Td>{user.currentTrophy}</Td>
+                    <Td>
+                      {user.totalHours.toFixed(2)}{" "}
+                      {user.totalHours <= 1 ? "hr" : "hrs"}
+                    </Td>
+                  </Tr>
+                ))}
+              </tbody>
+            </Table>
+          </TableContainer>
+
+          <MyRankDetailsBox
+            userDetails={{
+              ...myRankData,
+              focusHours: myRankData?.focusHours?.toFixed(2),
+            }}
+          ></MyRankDetailsBox>
+        </Container>
+      )}
+    </>
   );
 }
 

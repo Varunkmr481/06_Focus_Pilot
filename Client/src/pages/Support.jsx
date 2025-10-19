@@ -565,6 +565,7 @@ import React from "react";
 import { MdMail } from "react-icons/md";
 import { IoChatbubbleOutline } from "react-icons/io5";
 import styled from "styled-components";
+import toast from "react-hot-toast";
 
 // --- General Styles ---
 const PageWrapper = styled.div`
@@ -803,6 +804,15 @@ const AuthorTitle = styled.span`
 `;
 
 const Support = () => {
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    // try {
+    // } catch (err) {
+    //   toast.error(err.message);
+    // }
+  };
+
   return (
     <PageWrapper>
       <ContentCard>
@@ -819,7 +829,7 @@ const Support = () => {
             </SubHeaderText>
           </SectionHeader>
 
-          <FormLayout>
+          <FormLayout onSubmit={handleSubmit}>
             <FormRow>
               <FormField>
                 <label htmlFor="firstName">First name</label>
