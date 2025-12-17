@@ -39,14 +39,14 @@
     <li><a href="#-about-the-project">About The Project</a></li>
     <li><a href="#-key-features">Key Features</a>
       <ul>
-        <li><a href="#dashboard--intelligent-analytics">Dashboard & Intelligent Analytics</a></li>
-        <li><a href="#social--progression">Social & Progression</a></li>
-        <li><a href="#focus-mode--gamification">Focus Mode & Gamification</a></li>
-        <li><a href="#planner-dashboard--analytics">Planner Dashboard & Analytics</a></li>
-        <li><a href="#focus-table--history">Focus Table & History</a></li>
-        <li><a href="#smart-planner">Smart Planner</a></li>
-        <li><a href="#consistency-chart-coming-soon">Consistency Chart</a></li>
         <li><a href="#user-profile--settings">User Profile & Settings</a></li>
+        <li><a href="#focus-mode--gamification">Focus Mode & Gamification</a></li>
+        <li><a href="#focus-table--history">Focus Table & History</a></li>
+        <li><a href="#dashboard--intelligent-analytics">Dashboard & Intelligent Analytics</a></li>
+        <li><a href="#smart-planner">Smart Planner</a></li>
+        <li><a href="#planner-dashboard--analytics">Planner Dashboard & Analytics</a></li>
+        <li><a href="#consistency-chart-coming-soon">Consistency Chart</a></li>
+        <li><a href="#social--progression">Social & Progression</a></li>
       </ul>
     </li>
     <li><a href="#%EF%B8%8F-tech-stack">Tech Stack</a></li>
@@ -67,3 +67,21 @@
 > _"Productivity is never an accident. It is always the result of a commitment to excellence, intelligent planning, and focused effort."_
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<a id="-key-features"></a>
+
+## ✨ Key Features
+
+<a id="user-profile--settings"></a>
+
+### ⚙️ User Profile & Settings
+
+Complete control over your account, security, and app experience.
+
+| Feature                | Description                                                                                                                                                                        |
+| :--------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **👤 Profile Hub**     | Your personal identity card. View your **Verification Status**, update your **Profile Picture**, and see your account details at a glance. Accessible via the smart dropdown menu. |
+| **🛡️ Security Center** | Manage your credentials with ease. You can **Update your Name/Email**, **Change your Password**, or request a **Reset Link** if you've forgotten your login details.               |
+| **🎨 App Preferences** | Customize FocusPilot to fit your workflow. Toggle **Dark Mode** for night sessions, manage **Weekly Email Alerts**, or enable **Work Mode**.                                       |
+| **🎓 Guided Tours**    | Never get lost. Access the **Tutorial Tour** settings to restart the onboarding guide from scratch or resume exactly where you left off (e.g., Step 5).                            |
+| **⚠️ Danger Zone**     | Includes critical actions like **Delete Account**, ensuring you have full ownership and control over your data footprint.                                                          |
