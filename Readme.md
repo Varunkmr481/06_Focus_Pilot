@@ -1,3 +1,5 @@
+<a id="readme-top"></a>
+
 <div align="center">
 
   <img src="https://img.shields.io/github/stars/Varunkmr481/FocusPilot?style=flat-square&color=6e5494" alt="GitHub stars">
@@ -9,7 +11,7 @@
   <br />
 
   <a href="https://github.com/Varunkmr481/FocusPilot">
-    <img src="./assets/Focuspilot_banner.png" alt="FocusPilot Banner" width="100%">
+    <img src="./Client/assets/Focuspilot_banner.png" alt="FocusPilot Banner" width="100%">
   </a>
 
   <h1 align="center" style="font-size: 3rem; font-weight: bold;">FocusPilot</h1>
@@ -29,3 +31,39 @@
 </div>
 
 ---
+
+<details open>
+  <summary><b>📖 Table of Contents</b></summary>
+  <br />
+  <ol>
+    <li><a href="#-about-the-project">About The Project</a></li>
+    <li><a href="#-key-features">Key Features</a>
+      <ul>
+        <li><a href="#dashboard--intelligent-analytics">Dashboard & Intelligent Analytics</a></li>
+        <li><a href="#social--progression">Social & Progression</a></li>
+        <li><a href="#focus-mode--gamification">Focus Mode & Gamification</a></li>
+        <li><a href="#planner-dashboard--analytics">Planner Dashboard & Analytics</a></li>
+        <li><a href="#focus-table--history">Focus Table & History</a></li>
+        <li><a href="#smart-planner">Smart Planner</a></li>
+        <li><a href="#consistency-chart-coming-soon">Consistency Chart</a></li>
+        <li><a href="#user-profile--settings">User Profile & Settings</a></li>
+      </ul>
+    </li>
+    <li><a href="#%EF%B8%8F-tech-stack">Tech Stack</a></li>
+    <li><a href="#-getting-started">Getting Started</a></li>
+    <li><a href="#-contributing">Contributing</a></li>
+    <li><a href="#-contact--support">Contact & Support</a></li>
+  </ol>
+</details>
+
+<br />
+
+<a id="-about-the-project"></a>
+
+## 🛸 About The Project
+
+**FocusPilot** isn't just another to-do list. It's an ecosystem designed for students, developers, and professionals who want to understand their work habits and improve their output. By combining sleek design with powerful AI analytics, FocusPilot turns productivity into a tangible, trackable game.
+
+> _"Productivity is never an accident. It is always the result of a commitment to excellence, intelligent planning, and focused effort."_
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
