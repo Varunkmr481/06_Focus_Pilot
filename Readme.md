@@ -178,3 +178,38 @@ Stay motivated by competing with others and tracking your personal growth.
 | **🥇 Global Leaderboard**    | See where you stand against the world. The leaderboard displays the **Top 10 Performers**, showcasing their Rank, Badges, Trophies, and Total Focus Hours.                                      |
 | **🧍 Personal Rank Tracker** | Never lose sight of your own progress. A dedicated footer on the leaderboard screen shows your specific **Rank, Badge, and Total Focus Time**, allowing for instant comparison with the top 10. |
 | **🎖️ Milestone Badges**      | A clear path to mastery. View all unlockable badges, from **Level 0 (Beginner)** to **Level 9**. Each level displays the exact points/hours required to unlock the next prestige.               |
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## 🏗️ Tech Stack
+
+FocusPilot is built on a robust, modern foundation designed for scalability and performance.
+
+| Area                    | Technology                                                                                                                                                                                                                                                                                                                                                    |
+| :---------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Frontend**            | ![React](https://img.shields.io/badge/React-20232A?style=flat-square&logo=react&logoColor=61DAFB) ![React Router](https://img.shields.io/badge/React_Router-CA4245?style=flat-square&logo=react-router&logoColor=white) ![Styled Components](https://img.shields.io/badge/styled--components-DB7093?style=flat-square&logo=styled-components&logoColor=white) |
+| **Backend**             | ![NodeJS](https://img.shields.io/badge/Node.js-43853D?style=flat-square&logo=node.js&logoColor=white) ![ExpressJS](https://img.shields.io/badge/Express.js-404D59?style=flat-square)                                                                                                                                                                          |
+| **Database & Cloud**    | ![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=flat-square&logo=mongodb&logoColor=white) ![Cloudinary](https://img.shields.io/badge/Cloudinary-3448C5?style=flat-square&logo=cloudinary&logoColor=white)                                                                                                                                        |
+| **AI & Authentication** | ![Gemini](https://img.shields.io/badge/Google%20Gemini-8E75B2?style=flat-square&logo=google&logoColor=white) ![Google Cloud](https://img.shields.io/badge/Google_OAuth-4285F4?style=flat-square&logo=google-cloud&logoColor=white) ![JWT](https://img.shields.io/badge/JSON%20Web%20Tokens-000000?style=flat-square&logo=jsonwebtokens&logoColor=white)       |
+| **Deployment**          | ![Netlify](https://img.shields.io/badge/Netlify-00C7B7?style=flat-square&logo=netlify&logoColor=white) ![Render](https://img.shields.io/badge/Render-46E3B7?style=flat-square&logo=render&logoColor=white)                                                                                                                                                    |
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## 📩 Contact & Support
+
+Developed with ❤️ by **Varun Kumar**
+
+<!-- - 🐦 **Twitter/X:** [@YourHandle](https://twitter.com/yourhandle) -->
+<!-- - 💼 **LinkedIn:** [Profile Link](https://linkedin.com/in/yourprofile) -->
+
+- 📧 **Email:** kmrvarun481@gmail.com
+
+<div align="center">
+  <br />
+  <p>Did you find this project useful?</p>
+  <a href="https://github.com/Varunkmr481/FocusPilot">
+    <img src="https://img.shields.io/badge/⭐%20Star%20us%20on%20GitHub-gray?style=for-the-badge&logo=github" alt="Star on GitHub">
+  </a>
+</div>
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
