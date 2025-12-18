@@ -115,6 +115,33 @@ A complete historical ledger of your productivity journey. No session is ever lo
 | **🚑 Crash Recovery**       | Internet cut out? PC shut down? FocusPilot detects **Invalid Sessions** and lets you manually recover the data or delete the entry so your stats remain accurate. |
 | **👀 Distraction Insights** | Click the "Eye" icon on any past session to reveal a detailed list of every distraction logged during that specific block of time.                                |
 
+<a id="dashboard--intelligent-analytics"></a>
+
+### 📈 Dashboard & Intelligent Analytics
+
+A centralized command center that visualizes your journey and uses AI to coach you toward better habits.
+
+| Feature                          | Description                                                                                                                                                                                                                                                                                                      |
+| :------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **🤖 FocusPilot AI Chatbot**     | Meet **"Focus"**, your personal productivity assistant. Accessible via a floating button, it can help you **plan daily tasks**, **check your stats**, or explain app features instantly.                                                                                                                         |
+| **📊 Visual Data Visualization** | Understand your habits instantly with three core charts: <br>• **Focus Time Line Chart:** Track hours spent across days/months. <br>• **Distraction Bar Graph:** Identify when and how often you lose focus. <br>• **Session Goal Pie Chart:** See the breakdown of your work (e.g., Deep Work vs. Light Tasks). |
+| **🧠 Optimal Focus Period**      | **AI-Powered:** Analyzes your last 2-3 months of data to identify your "Golden Hours"—the specific time of day when you are most productive—so you can schedule hard tasks then.                                                                                                                                 |
+| **🔮 Milestone Prediction**      | **AI-Powered:** Uses your current velocity to predict _exactly_ when you'll hit your next level. It also provides actionable tips (e.g., "Focus for 6 hours/day to hit Novice in 7 days").                                                                                                                       |
+| **📅 Dynamic Filtering**         | Slice your data your way. Toggle stats between **Today, Yesterday, This Month, Last Month, or This Year** for granular insights.                                                                                                                                                                                 |
+
+<a id="smart-planner"></a>
+
+### 🗓️ Smart Planner
+
+A fully integrated scheduling system to organize your day without leaving the app.
+
+| Feature                         | Description                                                                                                                                                                         |
+| :------------------------------ | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **🖱️ Drag-and-Drop Scheduling** | Intuitive interface allowing you to create tasks by clicking the **Add Button** or simply **dragging your mouse**.                                                                  |
+| **🎨 Custom Task Details**      | Define your tasks with precision. Set **Titles**, **Descriptions**, **Start/End Times**, and assign specific **Colors** for easy visual distinction.                                |
+| **🏷️ Category Management**      | The backbone of your analytics. Assign tasks to specific **Categories** (e.g., Gym, Study) to track consistency. You can add, edit, or delete categories directly from the manager. |
+| **👀 Multi-View Layouts**       | Visualize your schedule your way. Switch seamlessly between **Month**, **Week**, **Day**, or the list-based **Agenda View** to see your upcoming plans at a glance.                 |
+
 <a id="planner-dashboard--analytics"></a>
 
 ### 📉 Planner Dashboard & Analytics
@@ -127,3 +154,27 @@ Gain deep insights into how you plan your life. This dedicated dashboard analyze
 | **⚖️ Activity Imbalance Report** | A smart analysis tool that detects neglected areas of your life. It identifies categories with under 20% usage and suggests where to re-balance your focus so no goal gets left behind.                                                            |
 | **📊 Visual Planning Trends**    | Two powerful charts to visualize your schedule: <br>• **Bar Graph:** View task distribution over dates/times to spot heavy workload days. <br>• **Pie Chart:** See the exact percentage breakdown of every category (e.g., 38% Coding, 15% Study). |
 | **📅 Time-Travel Filters**       | Analyze your planning history with precision. Use the **Filter Buttons** to switch stats between **Today, Yesterday, This Week, This Month, Last Month, or This Year**.                                                                            |
+
+<a id="consistency-chart-coming-soon"></a>
+
+### 📅 Consistency Chart (Coming Soon)
+
+A powerful upcoming feature designed to help you visualize your long-term commitment and build unbreakable habits.
+
+| Feature                     | Description                                                                                                                                    |
+| :-------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------- |
+| **🎯 Goal Setting**         | Define custom weekly goals for specific categories (e.g., "Study", "Gym", or "Coding").                                                        |
+| **📊 Visual Habit Tracker** | A dynamic chart that tracks how consistently you meet your target hours over time, providing a clear visual representation of your discipline. |
+| **🔗 Planner Integration**  | Automatically pulls data from your **Planner** to verify if you met your scheduled target hours for each category.                             |
+
+<a id="social--progression"></a>
+
+### 🏆 Social & Progression
+
+Stay motivated by competing with others and tracking your personal growth.
+
+| Feature                      | Description                                                                                                                                                                                     |
+| :--------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **🥇 Global Leaderboard**    | See where you stand against the world. The leaderboard displays the **Top 10 Performers**, showcasing their Rank, Badges, Trophies, and Total Focus Hours.                                      |
+| **🧍 Personal Rank Tracker** | Never lose sight of your own progress. A dedicated footer on the leaderboard screen shows your specific **Rank, Badge, and Total Focus Time**, allowing for instant comparison with the top 10. |
+| **🎖️ Milestone Badges**      | A clear path to mastery. View all unlockable badges, from **Level 0 (Beginner)** to **Level 9**. Each level displays the exact points/hours required to unlock the next prestige.               |
