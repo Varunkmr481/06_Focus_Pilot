@@ -52,6 +52,7 @@
     <li><a href="#%EF%B8%8F-tech-stack">Tech Stack</a></li>
     <!-- <li><a href="#-getting-started">Getting Started</a></li> --> 
     <!-- <li><a href="#-contributing">Contributing</a></li> -->
+<li><a href="project--status">Project Status, Code Availability & Deployment</a></li>
     <li><a href="#-contact--support">Contact & Support</a></li>
   </ol>
 </details>
@@ -195,6 +196,7 @@ FocusPilot is built on a robust, modern foundation designed for scalability and 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+<a id="project--status"></a>
 ## 🧪 Project Status, Code Availability & Deployment
 
 ### 🚀 Live Demo (Beta)
@@ -217,6 +219,8 @@ This public repository is intended **only for showcase and documentation purpose
 Once the project exits Beta and reaches a stable production state, the **complete source code will be made public in phases**.
 
 Thank you for your patience and support during the Beta phase.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## 📩 Contact & Support
 
