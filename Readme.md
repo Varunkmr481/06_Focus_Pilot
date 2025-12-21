@@ -50,8 +50,8 @@
       </ul>
     </li>
     <li><a href="#%EF%B8%8F-tech-stack">Tech Stack</a></li>
-    <li><a href="#-getting-started">Getting Started</a></li>
-    <li><a href="#-contributing">Contributing</a></li>
+    <!-- <li><a href="#-getting-started">Getting Started</a></li> --> 
+    <!-- <li><a href="#-contributing">Contributing</a></li> -->
     <li><a href="#-contact--support">Contact & Support</a></li>
   </ol>
 </details>
@@ -194,6 +194,29 @@ FocusPilot is built on a robust, modern foundation designed for scalability and 
 | **Deployment**          | ![Netlify](https://img.shields.io/badge/Netlify-00C7B7?style=flat-square&logo=netlify&logoColor=white) ![Render](https://img.shields.io/badge/Render-46E3B7?style=flat-square&logo=render&logoColor=white)                                                                                                                                                    |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## 🧪 Project Status, Code Availability & Deployment
+
+### 🚀 Live Demo (Beta)
+The application is **live and functional**, but it is currently in **Beta mode**.  
+Some bugs or incomplete features may exist, and improvements are being actively worked on.
+
+### 🔒 Code Availability
+This public repository is intended **only for showcase and documentation purposes**.
+
+- Around **40–50% of the overall codebase** is available here
+- The **live demo is deployed from a separate private GitHub repository**
+- Core business logic, backend services, and sensitive implementations are kept **private** for security and stability
+
+### 🔧 Active Development
+- Bugs are being continuously identified and fixed
+- Features and performance are being refined
+- Stability and scalability are top priorities at this stage
+
+### 📢 Future Plan
+Once the project exits Beta and reaches a stable production state, the **complete source code will be made public in phases**.
+
+Thank you for your patience and support during the Beta phase.
 
 ## 📩 Contact & Support
 
