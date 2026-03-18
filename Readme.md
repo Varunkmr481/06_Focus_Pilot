@@ -206,7 +206,7 @@ Some bugs or incomplete features may exist, and improvements are being actively 
 ### 🔒 Code Availability
 This public repository is intended **only for showcase and documentation purposes**.
 
-- Around **40–50% of the overall codebase** is available here
+- Around **20–30% of the overall codebase** is available here
 - The **live demo is deployed from a separate private GitHub repository**
 - Core business logic, backend services, and sensitive implementations are kept **private** for security and stability
 
